@@ -11,8 +11,11 @@ import hashlib
 import json
 import os
 import sys
+import tempfile
+import threading
 import uuid
 from datetime import date
+from functools import wraps
 from typing import Optional
 
 import base64
@@ -44,8 +47,7 @@ def _load_patients() -> list[dict]:
 
 
 def _save_patients(data: list[dict]) -> None:
-    with open(_PATIENTS_PATH, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(_PATIENTS_PATH, data)
 
 
 def _load_doctors() -> list[dict]:
@@ -54,8 +56,36 @@ def _load_doctors() -> list[dict]:
 
 
 def _save_doctors(data: list[dict]) -> None:
-    with open(_DOCTORS_PATH, "w") as f:
-        json.dump(data, f, indent=2)
+    _write_json_atomic(_DOCTORS_PATH, data)
+
+
+def _write_json_atomic(path: str, data: list[dict]) -> None:
+    """Write to a temp file and rename over the target, so readers never
+    see a truncated or half-written file."""
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(data, f, indent=2)
+        os.replace(tmp, path)
+    except BaseException:
+        os.unlink(tmp)
+        raise
+
+
+# Serializes every load → modify → save sequence on the JSON store.
+# FastAPI runs sync endpoints in a thread pool, so without this two writes
+# can interleave and one silently overwrites the other. Process-local:
+# the app runs as a single uvicorn worker (see railway.toml).
+_STORE_LOCK = threading.Lock()
+
+
+def _exclusive_store(fn):
+    """Run a write endpoint while holding the store lock."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        with _STORE_LOCK:
+            return fn(*args, **kwargs)
+    return wrapper
 
 
 def _hash(password: str) -> str:
@@ -145,6 +175,7 @@ def login(req: LoginRequest):
 
 
 @app.post("/api/auth/register/patient")
+@_exclusive_store
 def register_patient(req: RegisterPatientRequest):
     patients = _load_patients()
     if any(p.get("email", "").lower() == req.email.lower() for p in patients):
@@ -172,6 +203,7 @@ def register_patient(req: RegisterPatientRequest):
 
 
 @app.post("/api/auth/register/doctor")
+@_exclusive_store
 def register_doctor(req: RegisterDoctorRequest):
     doctors = _load_doctors()
     if any(d.get("email", "").lower() == req.email.lower() for d in doctors):
@@ -241,6 +273,7 @@ def get_patient_analysis(patient_id: str):
 
 
 @app.post("/api/patients/{patient_id}/scan")
+@_exclusive_store
 def add_scan(patient_id: str, req: ScanRequest):
     patients = _load_patients()
     for p in patients:
@@ -321,6 +354,7 @@ def get_doctor_patients(doctor_id: str):
 
 
 @app.post("/api/doctors/{doctor_id}/patients/{patient_id}")
+@_exclusive_store
 def add_patient_to_doctor(doctor_id: str, patient_id: str):
     doctors = _load_doctors()
     patients = _load_patients()
@@ -337,6 +371,7 @@ def add_patient_to_doctor(doctor_id: str, patient_id: str):
 
 
 @app.delete("/api/doctors/{doctor_id}/patients/{patient_id}")
+@_exclusive_store
 def remove_patient_from_doctor(doctor_id: str, patient_id: str):
     doctors = _load_doctors()
     for d in doctors:
