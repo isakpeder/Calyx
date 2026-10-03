@@ -36,6 +36,12 @@ BASE = f"http://127.0.0.1:{PORT}"
 PATIENT_ID = "P001"
 N_IMAGES = 8
 
+# Shared with the server subprocess so this script can mint a valid token
+os.environ.setdefault("CALYX_JWT_SECRET", "calyx-load-test-secret-not-for-production")
+from api.auth import create_token  # noqa: E402
+
+AUTH = {"Authorization": f"Bearer {create_token(PATIENT_ID, 'patient')}"}
+
 
 def _uploads() -> list[bytes]:
     out = []
@@ -50,10 +56,10 @@ def _uploads() -> list[bytes]:
 def _start_server(workers: int) -> subprocess.Popen:
     cmd = [sys.executable, "-m", "uvicorn", "api.main:app", "--host", "127.0.0.1",
            "--port", str(PORT), "--workers", str(workers), "--log-level", "warning"]
-    proc = subprocess.Popen(cmd, cwd=Path(__file__).parents[2])
+    proc = subprocess.Popen(cmd, cwd=Path(__file__).parents[2], env=os.environ.copy())
     for _ in range(100):
         try:
-            if httpx.get(f"{BASE}/api/patients", timeout=1).status_code == 200:
+            if httpx.get(f"{BASE}/api/doctors", timeout=1).status_code == 200:
                 return proc
         except httpx.HTTPError:
             pass
@@ -70,7 +76,8 @@ async def _user(client: httpx.AsyncClient, uploads: list[bytes], n: int, offset:
         try:
             r = await client.post(f"{BASE}/api/scan/analyze",
                                   data={"patient_id": PATIENT_ID},
-                                  files={"file": ("wound.jpg", body, "image/jpeg")})
+                                  files={"file": ("wound.jpg", body, "image/jpeg")},
+                                  headers=AUTH)
             if r.status_code != 200:
                 errors.append(str(r.status_code))
                 continue

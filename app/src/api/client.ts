@@ -1,23 +1,40 @@
 import axios from 'axios'
-import type { AnalysisResult, Doctor, Patient, PatientWithSummary } from '../types'
+import type { AnalysisResult, AuthResponse, Doctor, DoctorListing, Patient, PatientWithSummary } from '../types'
+import { clearSession, getToken } from './session'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
 })
 
+api.interceptors.request.use(config => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// Expired or missing token → back to the login screen
+api.interceptors.response.use(undefined, error => {
+  const isAuthCall = error.config?.url?.startsWith('/api/auth/')
+  if (error.response?.status === 401 && !isAuthCall) {
+    clearSession()
+    window.location.href = '/'
+  }
+  return Promise.reject(error)
+})
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export const login = (email: string, password: string) =>
-  api.post<Patient | Doctor>('/api/auth/login', { email, password }).then(r => r.data)
+  api.post<AuthResponse>('/api/auth/login', { email, password }).then(r => r.data)
 
 export const registerPatient = (data: {
   email: string; password: string; name: string; age: number
   comorbidities: string[]; blood_glucose?: number; serum_albumin?: number
   mobility_score?: number; post_op_day?: number; doctor_id?: string
-}) => api.post<Patient>('/api/auth/register/patient', data).then(r => r.data)
+}) => api.post<Patient & { token: string }>('/api/auth/register/patient', data).then(r => r.data)
 
 export const registerDoctor = (data: {
   email: string; password: string; name: string; specialty: string
-}) => api.post<Doctor>('/api/auth/register/doctor', data).then(r => r.data)
+}) => api.post<Doctor & { token: string }>('/api/auth/register/doctor', data).then(r => r.data)
 
 // ── Patients ──────────────────────────────────────────────────────────────────
 export const getPatient = (id: string) =>
@@ -30,7 +47,7 @@ export const getPatientAnalysis = (id: string) =>
   api.get<AnalysisResult>(`/api/patients/${id}/analysis`).then(r => r.data)
 
 export const getDoctors = () =>
-  api.get<Doctor[]>('/api/doctors').then(r => r.data)
+  api.get<DoctorListing[]>('/api/doctors').then(r => r.data)
 
 // ── Doctor ────────────────────────────────────────────────────────────────────
 export const getDoctorPatients = (doctorId: string) =>

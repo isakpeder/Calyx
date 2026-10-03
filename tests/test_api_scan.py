@@ -14,8 +14,10 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from api import main  # noqa: E402
+from api.auth import create_token  # noqa: E402
 
 client = TestClient(main.app)
+AUTH = {"Authorization": f"Bearer {create_token('P001', 'patient')}"}
 
 
 def _jpeg(h: int = 400, w: int = 400) -> bytes:
@@ -26,7 +28,7 @@ def _jpeg(h: int = 400, w: int = 400) -> bytes:
 
 def _post(body: bytes):
     return client.post("/api/scan/analyze", data={"patient_id": "P001"},
-                       files={"file": ("wound.jpg", body, "image/jpeg")})
+                       files={"file": ("wound.jpg", body, "image/jpeg")}, headers=AUTH)
 
 
 def test_valid_upload_returns_assessment():

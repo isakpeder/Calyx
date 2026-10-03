@@ -22,7 +22,7 @@ import base64
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 import anyio
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -31,6 +31,14 @@ from pydantic import BaseModel
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 
+from api.auth import (
+    check_patient_access,
+    create_token,
+    current_user,
+    doctor_only,
+    doctor_self,
+    patient_access,
+)
 from knowledge_graph import evaluate_healing
 
 # ---------------------------------------------------------------------------
@@ -162,13 +170,13 @@ def login(req: LoginRequest):
     for p in _load_patients():
         if p.get("email", "").lower() == req.email.strip().lower():
             if p.get("password_hash") == ph:
-                return _safe_patient(p)
+                return {**_safe_patient(p), "token": create_token(p["patient_id"], "patient")}
             raise HTTPException(status_code=401, detail="Wrong password")
 
     for d in _load_doctors():
         if d.get("email", "").lower() == req.email.strip().lower():
             if d.get("password_hash") == ph:
-                return _safe_doctor(d)
+                return {**_safe_doctor(d), "token": create_token(d["doctor_id"], "doctor")}
             raise HTTPException(status_code=401, detail="Wrong password")
 
     raise HTTPException(status_code=404, detail="No account found with that email")
@@ -199,7 +207,7 @@ def register_patient(req: RegisterPatientRequest):
     }
     patients.append(new_patient)
     _save_patients(patients)
-    return _safe_patient(new_patient)
+    return {**_safe_patient(new_patient), "token": create_token(new_patient["patient_id"], "patient")}
 
 
 @app.post("/api/auth/register/doctor")
@@ -220,19 +228,19 @@ def register_doctor(req: RegisterDoctorRequest):
     }
     doctors.append(new_doctor)
     _save_doctors(doctors)
-    return _safe_doctor(new_doctor)
+    return {**_safe_doctor(new_doctor), "token": create_token(new_doctor["doctor_id"], "doctor")}
 
 
 # ---------------------------------------------------------------------------
 # Patient routes
 # ---------------------------------------------------------------------------
 
-@app.get("/api/patients")
+@app.get("/api/patients", dependencies=[Depends(doctor_only)])
 def get_all_patients():
     return [_safe_patient(p) for p in _load_patients()]
 
 
-@app.get("/api/patients/{patient_id}")
+@app.get("/api/patients/{patient_id}", dependencies=[Depends(patient_access)])
 def get_patient(patient_id: str):
     for p in _load_patients():
         if p["patient_id"] == patient_id:
@@ -240,7 +248,7 @@ def get_patient(patient_id: str):
     raise HTTPException(status_code=404, detail="Patient not found")
 
 
-@app.get("/api/patients/{patient_id}/analysis")
+@app.get("/api/patients/{patient_id}/analysis", dependencies=[Depends(patient_access)])
 def get_patient_analysis(patient_id: str):
     patients = _load_patients()
     patient = next((p for p in patients if p["patient_id"] == patient_id), None)
@@ -272,7 +280,7 @@ def get_patient_analysis(patient_id: str):
     }
 
 
-@app.post("/api/patients/{patient_id}/scan")
+@app.post("/api/patients/{patient_id}/scan", dependencies=[Depends(patient_access)])
 @_exclusive_store
 def add_scan(patient_id: str, req: ScanRequest):
     patients = _load_patients()
@@ -308,7 +316,7 @@ def add_scan(patient_id: str, req: ScanRequest):
 # Doctor routes
 # ---------------------------------------------------------------------------
 
-@app.get("/api/doctors/{doctor_id}")
+@app.get("/api/doctors/{doctor_id}", dependencies=[Depends(doctor_self)])
 def get_doctor(doctor_id: str):
     for d in _load_doctors():
         if d["doctor_id"] == doctor_id:
@@ -316,7 +324,7 @@ def get_doctor(doctor_id: str):
     raise HTTPException(status_code=404, detail="Doctor not found")
 
 
-@app.get("/api/doctors/{doctor_id}/patients")
+@app.get("/api/doctors/{doctor_id}/patients", dependencies=[Depends(doctor_self)])
 def get_doctor_patients(doctor_id: str):
     doctor = next((d for d in _load_doctors() if d["doctor_id"] == doctor_id), None)
     if not doctor:
@@ -353,7 +361,7 @@ def get_doctor_patients(doctor_id: str):
     return result
 
 
-@app.post("/api/doctors/{doctor_id}/patients/{patient_id}")
+@app.post("/api/doctors/{doctor_id}/patients/{patient_id}", dependencies=[Depends(doctor_self)])
 @_exclusive_store
 def add_patient_to_doctor(doctor_id: str, patient_id: str):
     doctors = _load_doctors()
@@ -370,7 +378,7 @@ def add_patient_to_doctor(doctor_id: str, patient_id: str):
     raise HTTPException(status_code=404, detail="Doctor not found")
 
 
-@app.delete("/api/doctors/{doctor_id}/patients/{patient_id}")
+@app.delete("/api/doctors/{doctor_id}/patients/{patient_id}", dependencies=[Depends(doctor_self)])
 @_exclusive_store
 def remove_patient_from_doctor(doctor_id: str, patient_id: str):
     doctors = _load_doctors()
@@ -386,7 +394,11 @@ def remove_patient_from_doctor(doctor_id: str, patient_id: str):
 
 @app.get("/api/doctors")
 def get_all_doctors():
-    return [_safe_doctor(d) for d in _load_doctors()]
+    """Public directory for the registration form — no emails or patient lists."""
+    return [
+        {"doctor_id": d["doctor_id"], "name": d["name"], "specialty": d.get("specialty", "")}
+        for d in _load_doctors()
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -418,8 +430,10 @@ _SCAN_LIMITER = anyio.CapacityLimiter(os.cpu_count() or 1)
 async def vision_analyze(
     patient_id: str = Form(...),
     file: UploadFile = File(None),
+    user: dict = Depends(current_user),
 ):
     """Accept an uploaded wound image (or use demo), run CV pipeline + KG."""
+    check_patient_access(user, patient_id)
     raw = None
     if file and file.filename:
         raw = await file.read(MAX_UPLOAD_BYTES + 1)

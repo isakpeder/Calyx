@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDoctors, registerDoctor, registerPatient } from '../api/client'
 import { setSession } from '../api/session'
-import type { Doctor, User } from '../types'
+import type { AuthResponse, DoctorListing } from '../types'
 
 const COMORBIDITIES = [
   'Type 2 Diabetes', 'Obesity', 'Hypertension',
@@ -23,7 +23,7 @@ export default function CreateProfile() {
   const [loading, setLoading]     = useState(false)
   const navigate = useNavigate()
 
-  const finish = (user: User) => {
+  const finish = (user: AuthResponse) => {
     setSession(user)
     window.location.href = '/'
   }
@@ -138,7 +138,7 @@ function PatientForm({ error: _e, setError, loading, setLoading, onSuccess }: Fo
   const [mobility, setMobility] = useState('')
   const [podDay, setPodDay]     = useState('')
   const [selected, setSelected] = useState<string[]>([])
-  const [doctors, setDoctors]   = useState<Doctor[]>([])
+  const [doctors, setDoctors]   = useState<DoctorListing[]>([])
   const [doctorId, setDoctorId] = useState<string>('')
 
   useState(() => {
@@ -300,7 +300,7 @@ function DoctorForm({ error: _e, setError, loading, setLoading, onSuccess }: For
 interface FormProps {
   error: string; setError: (e: string) => void
   loading: boolean; setLoading: (l: boolean) => void
-  onSuccess: (u: User) => void
+  onSuccess: (u: AuthResponse) => void
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

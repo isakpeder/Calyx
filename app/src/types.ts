@@ -32,6 +32,11 @@ export interface Doctor {
 
 export type User = Patient | Doctor
 
+export type AuthResponse = User & { token: string }
+
+// Public doctor directory entry (registration form)
+export type DoctorListing = Pick<Doctor, 'doctor_id' | 'name' | 'specialty'>
+
 export interface AnalysisResult {
   priority: Priority
   alerts: string[]

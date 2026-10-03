@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../api/client'
 import { setSession } from '../api/session'
-import type { User } from '../types'
 
 export default function Login() {
   const [email, setEmail]       = useState('')
@@ -18,8 +17,7 @@ export default function Login() {
     setLoading(true)
     setError('')
     try {
-      const user = await login(email.trim(), password) as User
-      setSession(user)
+      setSession(await login(email.trim(), password))
       window.location.href = '/'   // full reload so App re-reads sessionStorage
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
