@@ -24,7 +24,9 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-from vision import analyze_frame, compute_wound_area, detect_wound_mask
+import math
+
+from vision import COIN_REAL_DIAM_CM, analyze_frame, compute_wound_area, detect_coin, detect_wound_mask
 
 from .scenes import make_scene
 
@@ -49,7 +51,7 @@ def main() -> None:
 
     errors: dict[str, list[float]] = defaultdict(list)
     by_tone: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
-    coin_found = coin_correct = 0
+    coin_found = coin_located = 0
     radius_errors: list[float] = []
     rows = []
 
@@ -69,10 +71,11 @@ def main() -> None:
 
         if with_coin["coin_found"]:
             coin_found += 1
-            detected_r = (2.426 / 2) / with_coin["scale_cm_per_px"]
+            detected_r = (COIN_REAL_DIAM_CM / 2) / with_coin["scale_cm_per_px"]
             radius_errors.append(abs(detected_r - scene.coin_radius_px) / scene.coin_radius_px * 100)
-            if radius_errors[-1] <= 10:
-                coin_correct += 1
+            cx, cy, _ = detect_coin(scene.image)
+            if math.dist((cx, cy), scene.coin_center) <= 0.5 * scene.coin_radius_px:
+                coin_located += 1
 
         rows.append({"seed": SEED_OFFSET + i, "tone": scene.skin_tone, "px_per_cm": round(scene.px_per_cm, 1),
                      "true_cm2": round(truth, 2), **{k: round(v, 2) for k, v in measured.items()},
@@ -84,7 +87,7 @@ def main() -> None:
         "by_skin_tone": {tone: {cond: _summarize(e) for cond, e in conds.items()}
                          for tone, conds in sorted(by_tone.items())},
         "coin_detection_rate": round(coin_found / args.n, 3),
-        "coin_correct_rate": round(coin_correct / args.n, 3),
+        "coin_located_rate": round(coin_located / args.n, 3),
         "coin_radius_median_error_pct": round(statistics.median(radius_errors), 1) if radius_errors else None,
         "scenes": rows,
     }
@@ -94,7 +97,7 @@ def main() -> None:
     out.write_text(json.dumps(results, indent=1) + "\n")
 
     print(f"n={args.n}  coin found {results['coin_detection_rate']:.1%}  "
-          f"correct coin {results['coin_correct_rate']:.1%}  "
+          f"right object {results['coin_located_rate']:.1%}  "
           f"radius err {results['coin_radius_median_error_pct']}%")
     print(f"{'':10}{'median err':>11}{'within 10%':>12}{'accuracy':>10}")
     for cond, s in results["conditions"].items():

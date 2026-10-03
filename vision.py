@@ -2,7 +2,7 @@
 vision.py — ChroniScan Computer Vision Pipeline
 
 Workflow (real mode):
-  1. detect_coin()       → calibration reference (pixel → cm scale)
+  1. calibrate()         → find coin, refine its radius (pixel → cm scale)
   2. detect_wound_mask() → isolate wound region via red HSV masking
   3. compute_wound_area()→ area in cm² via contour + scale factor
   4. ryb_segment()       → K-Means tissue classification (Red / Yellow / Black)
@@ -33,6 +33,14 @@ from data.mock_patients import PATIENTS, get_patient_by_id, get_latest_wound_dat
 
 COIN_REAL_DIAM_CM: float = 2.426   # US quarter diameter in cm
 
+# A quarter is neutral metal; skin and wound tissue are strongly coloured.
+# Hough candidates whose interior median HSV saturation exceeds this are
+# rejected (e.g. a round wound mistaken for the coin).
+COIN_MAX_SATURATION: int = 60
+
+# Fallback scale when no coin is found: ~38 px/cm on a typical smartphone
+FALLBACK_CM_PER_PX: float = 0.026
+
 # RYB overlay colours (BGR)
 _COLOUR_RED    = (60,  80, 220)    # granulation tissue
 _COLOUR_YELLOW = (0,  210, 240)    # slough
@@ -46,8 +54,12 @@ def detect_coin(img: np.ndarray) -> tuple | None:
     """
     Detect a circular coin in the image using HoughCircles.
 
-    Returns (cx, cy, radius_px) of the most prominent circle,
-    or None if no reliable circle is found.
+    Candidates are taken in accumulator order; the first whose interior is
+    neutral (low saturation) is accepted, so a round, red wound is never
+    mistaken for the coin.
+
+    Returns (cx, cy, radius_px) of the coin, or None if no reliable,
+    coin-coloured circle is found.
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (9, 9), 2)
@@ -65,9 +77,64 @@ def detect_coin(img: np.ndarray) -> tuple | None:
     if circles is None:
         return None
 
-    # Pick the circle with the highest accumulator score (first returned)
-    c = np.round(circles[0, 0]).astype(int)
-    return int(c[0]), int(c[1]), int(c[2])   # cx, cy, radius_px
+    saturation = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:, :, 1]
+    for circle in circles[0]:
+        cx, cy, r = (int(v) for v in np.round(circle))
+        interior = np.zeros(saturation.shape, np.uint8)
+        cv2.circle(interior, (cx, cy), max(1, int(r * 0.8)), 255, -1)
+        if np.median(saturation[interior == 255]) <= COIN_MAX_SATURATION:
+            return cx, cy, r   # cx, cy, radius_px
+    return None
+
+
+def refine_coin_radius(img: np.ndarray, coin: tuple, n_rays: int = 72) -> float:
+    """
+    Sub-pixel coin radius from the coin's outer edge.
+
+    HoughCircles localises the coin well but its radius is coarse and often
+    locks onto an inner rim. Instead, cast rays from the coin centre and find
+    the outermost strong change in saturation along each one: the boundary
+    between neutral metal and coloured skin. The median over rays is robust
+    to rays that hit glare or the wound.
+
+    Falls back to the Hough radius when too few rays find an edge.
+    """
+    cx, cy, r = coin
+    saturation = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:, :, 1].astype(np.float32)
+    saturation = cv2.GaussianBlur(saturation, (0, 0), 1.0)
+    h, w = saturation.shape
+
+    radii = np.arange(0.6 * r, 1.4 * r, 0.25, dtype=np.float32)
+    estimates = []
+    for theta in np.linspace(0, 2 * np.pi, n_rays, endpoint=False):
+        xs = (cx + radii * np.cos(theta)).astype(np.float32)
+        ys = (cy + radii * np.sin(theta)).astype(np.float32)
+        if xs.min() < 1 or ys.min() < 1 or xs.max() > w - 2 or ys.max() > h - 2:
+            continue
+        profile = cv2.remap(saturation, xs[None], ys[None], cv2.INTER_LINEAR)[0]
+        grad = np.abs(np.gradient(profile))
+        if grad.max() < 4:
+            continue
+
+        # Outermost strong edge, then climb to its local gradient peak
+        i = int(np.nonzero(grad >= 0.5 * grad.max())[0][-1])
+        while i > 0 and grad[i - 1] > grad[i]:
+            i -= 1
+        while i < len(grad) - 1 and grad[i + 1] > grad[i]:
+            i += 1
+        estimates.append(float(radii[i]))
+
+    if len(estimates) < n_rays // 4:
+        return float(r)
+    return float(np.median(estimates))
+
+
+def calibrate(img: np.ndarray, coin_diam_cm: float = COIN_REAL_DIAM_CM) -> tuple[tuple | None, float]:
+    """Return (coin, cm_per_px); falls back to FALLBACK_CM_PER_PX without a coin."""
+    coin = detect_coin(img)
+    if coin is None:
+        return None, FALLBACK_CM_PER_PX
+    return coin, compute_scale(refine_coin_radius(img, coin), coin_diam_cm)
 
 
 def compute_scale(radius_px: float, real_diam_cm: float = COIN_REAL_DIAM_CM) -> float:
@@ -396,12 +463,7 @@ def analyze_image(
         raise FileNotFoundError(f"Could not read image: {image_path}")
 
     # --- Calibration ---
-    coin = detect_coin(img)
-    if coin is not None:
-        cm_per_px = compute_scale(coin[2], coin_diam_cm)
-    else:
-        # Fallback: assume 1 px ≈ 0.026 cm (roughly 38 px/cm on a typical smartphone)
-        cm_per_px = 0.026
+    coin, cm_per_px = calibrate(img, coin_diam_cm)
 
     # --- Wound segmentation ---
     mask = detect_wound_mask(img)
@@ -466,8 +528,7 @@ def analyze_frame(
     if frame is None or frame.size == 0:
         raise ValueError("analyze_frame: received empty frame")
 
-    coin = detect_coin(frame)
-    cm_per_px = compute_scale(coin[2], coin_diam_cm) if coin is not None else 0.026
+    coin, cm_per_px = calibrate(frame, coin_diam_cm)
 
     mask = detect_wound_mask(frame)
 
