@@ -6,6 +6,7 @@ Test categories
 1. detect_coin         — finds a neutral coin, rejects a round red wound
 2. refine_coin_radius  — sub-pixel radius on several sizes and skin tones
 3. calibrate           — scale from the refined radius, fallback without a coin
+4. detect_wound_mask   — no skin false positives and correct area on all skin tones
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ from vision import (  # noqa: E402
     FALLBACK_CM_PER_PX,
     calibrate,
     detect_coin,
+    detect_wound_mask,
     refine_coin_radius,
 )
 
@@ -30,9 +32,9 @@ import cv2  # noqa: E402
 
 
 def _skin(tone: str = "fair", h: int = 480, w: int = 640) -> np.ndarray:
-    img = np.zeros((h, w, 3), np.uint8)
-    img[:] = SKIN_TONES[tone]
-    return img
+    """Skin with mild texture — real skin is never one flat colour."""
+    noise = np.random.default_rng(0).normal(0, 4, (h, w, 3))
+    return np.clip(np.array(SKIN_TONES[tone], np.float32) + noise, 0, 255).astype(np.uint8)
 
 
 def _with_coin(radius: float, tone: str = "fair", center=(470, 240)) -> np.ndarray:
@@ -98,3 +100,23 @@ class TestCalibrate:
         coin, cm_per_px = calibrate(_skin())
         assert coin is None
         assert cm_per_px == FALLBACK_CM_PER_PX
+
+
+# ===========================================================================
+# 4. detect_wound_mask across skin tones
+# ===========================================================================
+
+class TestWoundMaskSkinTones:
+    @pytest.mark.parametrize("tone", list(SKIN_TONES))
+    def test_bare_skin_produces_no_mask(self, tone):
+        assert np.count_nonzero(detect_wound_mask(_skin(tone))) == 0
+
+    @pytest.mark.parametrize("tone", list(SKIN_TONES))
+    def test_wound_area_on_every_skin_tone(self, tone):
+        img = _skin(tone)
+        wound = np.zeros(img.shape[:2], np.uint8)
+        cv2.circle(wound, (250, 240), 70, 255, -1)
+        img[wound == 255] = (40, 50, 200)
+        drawn = np.count_nonzero(wound)
+        detected = np.count_nonzero(detect_wound_mask(img))
+        assert detected == pytest.approx(drawn, rel=0.05)

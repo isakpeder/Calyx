@@ -38,6 +38,11 @@ COIN_REAL_DIAM_CM: float = 2.426   # US quarter diameter in cm
 # rejected (e.g. a round wound mistaken for the coin).
 COIN_MAX_SATURATION: int = 60
 
+# Wound pixels must differ from the patient's own skin by at least this
+# CIELAB colour distance (ΔE). Fixed HSV thresholds alone let darker,
+# more saturated skin tones pass as wound tissue.
+SKIN_DELTA_E_MIN: float = 25.0
+
 # Fallback scale when no coin is found: ~38 px/cm on a typical smartphone
 FALLBACK_CM_PER_PX: float = 0.026
 
@@ -142,16 +147,31 @@ def compute_scale(radius_px: float, real_diam_cm: float = COIN_REAL_DIAM_CM) -> 
     return real_diam_cm / (2.0 * radius_px)
 
 
+def _estimate_skin_lab(lab: np.ndarray, band_frac: float = 0.08) -> np.ndarray:
+    """Median CIELAB colour of the image border, where the photo shows skin."""
+    h, w = lab.shape[:2]
+    b = max(2, int(min(h, w) * band_frac))
+    border = np.concatenate([
+        lab[:b].reshape(-1, 3), lab[-b:].reshape(-1, 3),
+        lab[:, :b].reshape(-1, 3), lab[:, -b:].reshape(-1, 3),
+    ])
+    return np.median(border, axis=0)
+
+
 def detect_wound_mask(img: np.ndarray) -> np.ndarray:
     """
     Isolate the wound region by masking wound-coloured pixels in HSV space.
 
     Captures three tissue colour ranges:
       - Red (granulation): H ∈ [0, 10] or H ∈ [160, 180], S ≥ 120
-        S threshold raised to 120 (from 100) to exclude typical skin tones
-        (fair/medium skin sits at S ≈ 80-110, well below true wound tissue).
+        S threshold raised to 120 (from 100) to exclude fair skin (S ≈ 80-110).
       - Yellow (slough): H ∈ [15, 38], S ≥ 100, V ≥ 100
         Slough was entirely invisible to the old red-only mask.
+
+    Skin-relative gate: the patient's skin colour is estimated as the median
+    CIELAB colour of a band around the image border, and any pixel within
+    SKIN_DELTA_E_MIN of it is excluded. Darker skin (S ≈ 120-145, H ≈ 9-13)
+    otherwise falls inside the red range and swamps the mask.
 
     Returns a cleaned binary uint8 mask (255 = wound, 0 = background).
     """
@@ -169,6 +189,10 @@ def detect_wound_mask(img: np.ndarray) -> np.ndarray:
     yellow_mask = cv2.inRange(hsv, np.array([15, 100, 100]), np.array([38, 255, 255]))
 
     mask = cv2.bitwise_or(red_mask, yellow_mask)
+
+    # Skin-relative gate — drop pixels that look like this patient's skin
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB).astype(np.float32)
+    mask[np.linalg.norm(lab - _estimate_skin_lab(lab), axis=2) < SKIN_DELTA_E_MIN] = 0
 
     # Morphological cleanup: close small gaps, remove noise
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
