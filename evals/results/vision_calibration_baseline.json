@@ -1,0 +1,2130 @@
+{
+ "n_scenes": 200,
+ "conditions": {
+  "coin": {
+   "n": 200,
+   "median_error_pct": 100.0,
+   "within_10pct": 0.1,
+   "accuracy_pct": 32.6
+  },
+  "fallback": {
+   "n": 200,
+   "median_error_pct": 100.0,
+   "within_10pct": 0.03,
+   "accuracy_pct": 0.0
+  },
+  "oracle": {
+   "n": 200,
+   "median_error_pct": 519.0,
+   "within_10pct": 0.425,
+   "accuracy_pct": 0.0
+  }
+ },
+ "by_skin_tone": {
+  "dark": {
+   "coin": {
+    "n": 36,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   },
+   "fallback": {
+    "n": 36,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   },
+   "oracle": {
+    "n": 36,
+    "median_error_pct": 9058.2,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   }
+  },
+  "fair": {
+   "coin": {
+    "n": 33,
+    "median_error_pct": 22.8,
+    "within_10pct": 0.212,
+    "accuracy_pct": 73.5
+   },
+   "fallback": {
+    "n": 33,
+    "median_error_pct": 70.0,
+    "within_10pct": 0.061,
+    "accuracy_pct": 0.0
+   },
+   "oracle": {
+    "n": 33,
+    "median_error_pct": 1.8,
+    "within_10pct": 0.909,
+    "accuracy_pct": 0.0
+   }
+  },
+  "light": {
+   "coin": {
+    "n": 44,
+    "median_error_pct": 19.1,
+    "within_10pct": 0.295,
+    "accuracy_pct": 83.6
+   },
+   "fallback": {
+    "n": 44,
+    "median_error_pct": 64.5,
+    "within_10pct": 0.068,
+    "accuracy_pct": 0.0
+   },
+   "oracle": {
+    "n": 44,
+    "median_error_pct": 0.8,
+    "within_10pct": 1.0,
+    "accuracy_pct": 98.8
+   }
+  },
+  "medium": {
+   "coin": {
+    "n": 47,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   },
+   "fallback": {
+    "n": 47,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   },
+   "oracle": {
+    "n": 47,
+    "median_error_pct": 7283.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 0.0
+   }
+  },
+  "tan": {
+   "coin": {
+    "n": 40,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.0,
+    "accuracy_pct": 26.9
+   },
+   "fallback": {
+    "n": 40,
+    "median_error_pct": 100.0,
+    "within_10pct": 0.025,
+    "accuracy_pct": 0.0
+   },
+   "oracle": {
+    "n": 40,
+    "median_error_pct": 1180.8,
+    "within_10pct": 0.275,
+    "accuracy_pct": 0.0
+   }
+  }
+ },
+ "coin_detection_rate": 1.0,
+ "coin_correct_rate": 0.805,
+ "coin_radius_median_error_pct": 8.6,
+ "scenes": [
+  {
+   "seed": 10000,
+   "tone": "dark",
+   "px_per_cm": 67.3,
+   "true_cm2": 1.61,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 152.03,
+   "coin_found": true
+  },
+  {
+   "seed": 10001,
+   "tone": "medium",
+   "px_per_cm": 20.7,
+   "true_cm2": 11.44,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1603.24,
+   "coin_found": true
+  },
+  {
+   "seed": 10002,
+   "tone": "tan",
+   "px_per_cm": 26.1,
+   "true_cm2": 6.14,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1007.47,
+   "coin_found": true
+  },
+  {
+   "seed": 10003,
+   "tone": "fair",
+   "px_per_cm": 19.1,
+   "true_cm2": 1.28,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1.25,
+   "coin_found": true
+  },
+  {
+   "seed": 10004,
+   "tone": "dark",
+   "px_per_cm": 37.4,
+   "true_cm2": 13.82,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 493.21,
+   "coin_found": true
+  },
+  {
+   "seed": 10005,
+   "tone": "dark",
+   "px_per_cm": 48.3,
+   "true_cm2": 1.4,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 295.94,
+   "coin_found": true
+  },
+  {
+   "seed": 10006,
+   "tone": "fair",
+   "px_per_cm": 20.5,
+   "true_cm2": 8.26,
+   "coin": 11.14,
+   "fallback": 2.48,
+   "oracle": 8.68,
+   "coin_found": true
+  },
+  {
+   "seed": 10007,
+   "tone": "medium",
+   "px_per_cm": 55.2,
+   "true_cm2": 1.15,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 217.38,
+   "coin_found": true
+  },
+  {
+   "seed": 10008,
+   "tone": "fair",
+   "px_per_cm": 69.8,
+   "true_cm2": 17.06,
+   "coin": 20.73,
+   "fallback": 58.09,
+   "oracle": 17.14,
+   "coin_found": true
+  },
+  {
+   "seed": 10009,
+   "tone": "medium",
+   "px_per_cm": 25.4,
+   "true_cm2": 1.5,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1064.74,
+   "coin_found": true
+  },
+  {
+   "seed": 10010,
+   "tone": "dark",
+   "px_per_cm": 48.1,
+   "true_cm2": 1.11,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 298.18,
+   "coin_found": true
+  },
+  {
+   "seed": 10011,
+   "tone": "fair",
+   "px_per_cm": 41.2,
+   "true_cm2": 2.64,
+   "coin": 3.28,
+   "fallback": 6.9,
+   "oracle": 2.66,
+   "coin_found": true
+  },
+  {
+   "seed": 10012,
+   "tone": "tan",
+   "px_per_cm": 32.5,
+   "true_cm2": 0.68,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 654.59,
+   "coin_found": true
+  },
+  {
+   "seed": 10013,
+   "tone": "medium",
+   "px_per_cm": 37.9,
+   "true_cm2": 8.5,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 463.62,
+   "coin_found": true
+  },
+  {
+   "seed": 10014,
+   "tone": "tan",
+   "px_per_cm": 25.6,
+   "true_cm2": 11.03,
+   "coin": 13.46,
+   "fallback": 5.2,
+   "oracle": 11.71,
+   "coin_found": true
+  },
+  {
+   "seed": 10015,
+   "tone": "fair",
+   "px_per_cm": 60.1,
+   "true_cm2": 4.06,
+   "coin": 4.22,
+   "fallback": 41.38,
+   "oracle": 4.12,
+   "coin_found": true
+  },
+  {
+   "seed": 10016,
+   "tone": "tan",
+   "px_per_cm": 30.4,
+   "true_cm2": 15.61,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 664.39,
+   "coin_found": true
+  },
+  {
+   "seed": 10017,
+   "tone": "dark",
+   "px_per_cm": 68.8,
+   "true_cm2": 3.69,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 145.39,
+   "coin_found": true
+  },
+  {
+   "seed": 10018,
+   "tone": "dark",
+   "px_per_cm": 62.2,
+   "true_cm2": 1.6,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 178.37,
+   "coin_found": true
+  },
+  {
+   "seed": 10019,
+   "tone": "tan",
+   "px_per_cm": 35.3,
+   "true_cm2": 4.04,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 552.37,
+   "coin_found": true
+  },
+  {
+   "seed": 10020,
+   "tone": "light",
+   "px_per_cm": 21.2,
+   "true_cm2": 24.92,
+   "coin": 21.14,
+   "fallback": 3.69,
+   "oracle": 25.02,
+   "coin_found": true
+  },
+  {
+   "seed": 10021,
+   "tone": "dark",
+   "px_per_cm": 38.0,
+   "true_cm2": 9.18,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 477.74,
+   "coin_found": true
+  },
+  {
+   "seed": 10022,
+   "tone": "tan",
+   "px_per_cm": 53.2,
+   "true_cm2": 16.1,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 243.35,
+   "coin_found": true
+  },
+  {
+   "seed": 10023,
+   "tone": "fair",
+   "px_per_cm": 40.0,
+   "true_cm2": 2.45,
+   "coin": 2.43,
+   "fallback": 3.84,
+   "oracle": 2.48,
+   "coin_found": true
+  },
+  {
+   "seed": 10024,
+   "tone": "fair",
+   "px_per_cm": 54.2,
+   "true_cm2": 4.13,
+   "coin": 5.23,
+   "fallback": 24.98,
+   "oracle": 4.22,
+   "coin_found": true
+  },
+  {
+   "seed": 10025,
+   "tone": "tan",
+   "px_per_cm": 21.2,
+   "true_cm2": 5.76,
+   "coin": 7.25,
+   "fallback": 1.92,
+   "oracle": 6.33,
+   "coin_found": true
+  },
+  {
+   "seed": 10026,
+   "tone": "dark",
+   "px_per_cm": 25.2,
+   "true_cm2": 12.78,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1081.98,
+   "coin_found": true
+  },
+  {
+   "seed": 10027,
+   "tone": "fair",
+   "px_per_cm": 48.8,
+   "true_cm2": 17.81,
+   "coin": 21.7,
+   "fallback": 10.14,
+   "oracle": 18.05,
+   "coin_found": true
+  },
+  {
+   "seed": 10028,
+   "tone": "medium",
+   "px_per_cm": 22.8,
+   "true_cm2": 2.3,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1329.89,
+   "coin_found": true
+  },
+  {
+   "seed": 10029,
+   "tone": "fair",
+   "px_per_cm": 68.0,
+   "true_cm2": 1.4,
+   "coin": 1.69,
+   "fallback": 38.22,
+   "oracle": 1.44,
+   "coin_found": true
+  },
+  {
+   "seed": 10030,
+   "tone": "dark",
+   "px_per_cm": 58.5,
+   "true_cm2": 9.74,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 201.22,
+   "coin_found": true
+  },
+  {
+   "seed": 10031,
+   "tone": "medium",
+   "px_per_cm": 21.4,
+   "true_cm2": 3.91,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1498.82,
+   "coin_found": true
+  },
+  {
+   "seed": 10032,
+   "tone": "light",
+   "px_per_cm": 46.3,
+   "true_cm2": 14.91,
+   "coin": 14.33,
+   "fallback": 5.5,
+   "oracle": 14.78,
+   "coin_found": true
+  },
+  {
+   "seed": 10033,
+   "tone": "dark",
+   "px_per_cm": 68.4,
+   "true_cm2": 17.06,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 147.42,
+   "coin_found": true
+  },
+  {
+   "seed": 10034,
+   "tone": "dark",
+   "px_per_cm": 38.1,
+   "true_cm2": 15.75,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 475.95,
+   "coin_found": true
+  },
+  {
+   "seed": 10035,
+   "tone": "dark",
+   "px_per_cm": 43.8,
+   "true_cm2": 1.66,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 359.2,
+   "coin_found": true
+  },
+  {
+   "seed": 10036,
+   "tone": "medium",
+   "px_per_cm": 29.0,
+   "true_cm2": 1.26,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 799.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10037,
+   "tone": "fair",
+   "px_per_cm": 22.7,
+   "true_cm2": 2.52,
+   "coin": 3.19,
+   "fallback": 0.92,
+   "oracle": 2.64,
+   "coin_found": true
+  },
+  {
+   "seed": 10038,
+   "tone": "light",
+   "px_per_cm": 28.1,
+   "true_cm2": 3.13,
+   "coin": 3.78,
+   "fallback": 1.67,
+   "oracle": 3.13,
+   "coin_found": true
+  },
+  {
+   "seed": 10039,
+   "tone": "fair",
+   "px_per_cm": 23.1,
+   "true_cm2": 12.4,
+   "coin": 17.33,
+   "fallback": 6.56,
+   "oracle": 12.75,
+   "coin_found": true
+  },
+  {
+   "seed": 10040,
+   "tone": "light",
+   "px_per_cm": 30.6,
+   "true_cm2": 3.09,
+   "coin": 2.86,
+   "fallback": 8.52,
+   "oracle": 2.99,
+   "coin_found": true
+  },
+  {
+   "seed": 10041,
+   "tone": "tan",
+   "px_per_cm": 29.9,
+   "true_cm2": 8.02,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 773.26,
+   "coin_found": true
+  },
+  {
+   "seed": 10042,
+   "tone": "medium",
+   "px_per_cm": 46.5,
+   "true_cm2": 16.02,
+   "coin": 22.48,
+   "fallback": 25.37,
+   "oracle": 18.35,
+   "coin_found": true
+  },
+  {
+   "seed": 10043,
+   "tone": "light",
+   "px_per_cm": 66.2,
+   "true_cm2": 1.53,
+   "coin": 1.53,
+   "fallback": 6.13,
+   "oracle": 1.52,
+   "coin_found": true
+  },
+  {
+   "seed": 10044,
+   "tone": "fair",
+   "px_per_cm": 30.9,
+   "true_cm2": 1.15,
+   "coin": 1.5,
+   "fallback": 0.75,
+   "oracle": 1.16,
+   "coin_found": true
+  },
+  {
+   "seed": 10045,
+   "tone": "medium",
+   "px_per_cm": 44.5,
+   "true_cm2": 21.92,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 328.42,
+   "coin_found": true
+  },
+  {
+   "seed": 10046,
+   "tone": "medium",
+   "px_per_cm": 69.7,
+   "true_cm2": 3.41,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 141.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10047,
+   "tone": "tan",
+   "px_per_cm": 35.4,
+   "true_cm2": 2.23,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 545.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10048,
+   "tone": "light",
+   "px_per_cm": 37.3,
+   "true_cm2": 2.31,
+   "coin": 2.97,
+   "fallback": 6.07,
+   "oracle": 2.33,
+   "coin_found": true
+  },
+  {
+   "seed": 10049,
+   "tone": "light",
+   "px_per_cm": 35.6,
+   "true_cm2": 2.9,
+   "coin": 3.51,
+   "fallback": 2.45,
+   "oracle": 2.86,
+   "coin_found": true
+  },
+  {
+   "seed": 10050,
+   "tone": "fair",
+   "px_per_cm": 29.4,
+   "true_cm2": 3.78,
+   "coin": 6.45,
+   "fallback": 3.23,
+   "oracle": 5.51,
+   "coin_found": true
+  },
+  {
+   "seed": 10051,
+   "tone": "medium",
+   "px_per_cm": 48.7,
+   "true_cm2": 7.2,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 272.41,
+   "coin_found": true
+  },
+  {
+   "seed": 10052,
+   "tone": "tan",
+   "px_per_cm": 24.8,
+   "true_cm2": 10.79,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1100.69,
+   "coin_found": true
+  },
+  {
+   "seed": 10053,
+   "tone": "tan",
+   "px_per_cm": 50.7,
+   "true_cm2": 16.59,
+   "coin": 20.01,
+   "fallback": 29.86,
+   "oracle": 17.15,
+   "coin_found": true
+  },
+  {
+   "seed": 10054,
+   "tone": "light",
+   "px_per_cm": 66.4,
+   "true_cm2": 1.09,
+   "coin": 1.26,
+   "fallback": 3.18,
+   "oracle": 1.07,
+   "coin_found": true
+  },
+  {
+   "seed": 10055,
+   "tone": "dark",
+   "px_per_cm": 64.7,
+   "true_cm2": 12.73,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 164.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10056,
+   "tone": "light",
+   "px_per_cm": 72.5,
+   "true_cm2": 5.41,
+   "coin": 5.51,
+   "fallback": 5.04,
+   "oracle": 5.4,
+   "coin_found": true
+  },
+  {
+   "seed": 10057,
+   "tone": "light",
+   "px_per_cm": 46.2,
+   "true_cm2": 6.49,
+   "coin": 8.11,
+   "fallback": 14.05,
+   "oracle": 6.47,
+   "coin_found": true
+  },
+  {
+   "seed": 10058,
+   "tone": "fair",
+   "px_per_cm": 28.7,
+   "true_cm2": 3.19,
+   "coin": 3.92,
+   "fallback": 13.88,
+   "oracle": 3.32,
+   "coin_found": true
+  },
+  {
+   "seed": 10059,
+   "tone": "medium",
+   "px_per_cm": 32.1,
+   "true_cm2": 7.13,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 666.88,
+   "coin_found": true
+  },
+  {
+   "seed": 10060,
+   "tone": "tan",
+   "px_per_cm": 19.1,
+   "true_cm2": 1.6,
+   "coin": 2.64,
+   "fallback": 0.54,
+   "oracle": 2.17,
+   "coin_found": true
+  },
+  {
+   "seed": 10061,
+   "tone": "tan",
+   "px_per_cm": 47.6,
+   "true_cm2": 7.32,
+   "coin": 9.05,
+   "fallback": 32.42,
+   "oracle": 7.63,
+   "coin_found": true
+  },
+  {
+   "seed": 10062,
+   "tone": "tan",
+   "px_per_cm": 26.6,
+   "true_cm2": 5.1,
+   "coin": 10.55,
+   "fallback": 4.36,
+   "oracle": 9.09,
+   "coin_found": true
+  },
+  {
+   "seed": 10063,
+   "tone": "fair",
+   "px_per_cm": 63.4,
+   "true_cm2": 3.42,
+   "coin": 4.09,
+   "fallback": 9.47,
+   "oracle": 3.48,
+   "coin_found": true
+  },
+  {
+   "seed": 10064,
+   "tone": "dark",
+   "px_per_cm": 29.1,
+   "true_cm2": 5.68,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 816.8,
+   "coin_found": true
+  },
+  {
+   "seed": 10065,
+   "tone": "dark",
+   "px_per_cm": 26.2,
+   "true_cm2": 15.46,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1005.94,
+   "coin_found": true
+  },
+  {
+   "seed": 10066,
+   "tone": "medium",
+   "px_per_cm": 31.0,
+   "true_cm2": 0.82,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 715.85,
+   "coin_found": true
+  },
+  {
+   "seed": 10067,
+   "tone": "medium",
+   "px_per_cm": 48.1,
+   "true_cm2": 12.25,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 298.38,
+   "coin_found": true
+  },
+  {
+   "seed": 10068,
+   "tone": "light",
+   "px_per_cm": 20.1,
+   "true_cm2": 1.92,
+   "coin": 2.43,
+   "fallback": 0.49,
+   "oracle": 1.8,
+   "coin_found": true
+  },
+  {
+   "seed": 10069,
+   "tone": "medium",
+   "px_per_cm": 26.4,
+   "true_cm2": 1.39,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 924.75,
+   "coin_found": true
+  },
+  {
+   "seed": 10070,
+   "tone": "medium",
+   "px_per_cm": 26.9,
+   "true_cm2": 1.35,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 90.14,
+   "coin_found": true
+  },
+  {
+   "seed": 10071,
+   "tone": "fair",
+   "px_per_cm": 44.2,
+   "true_cm2": 2.78,
+   "coin": 3.42,
+   "fallback": 3.78,
+   "oracle": 2.86,
+   "coin_found": true
+  },
+  {
+   "seed": 10072,
+   "tone": "light",
+   "px_per_cm": 34.7,
+   "true_cm2": 7.06,
+   "coin": 9.11,
+   "fallback": 31.17,
+   "oracle": 7.04,
+   "coin_found": true
+  },
+  {
+   "seed": 10073,
+   "tone": "light",
+   "px_per_cm": 69.3,
+   "true_cm2": 13.82,
+   "coin": 16.56,
+   "fallback": 13.91,
+   "oracle": 13.9,
+   "coin_found": true
+  },
+  {
+   "seed": 10074,
+   "tone": "light",
+   "px_per_cm": 22.5,
+   "true_cm2": 6.87,
+   "coin": 8.82,
+   "fallback": 2.33,
+   "oracle": 6.81,
+   "coin_found": true
+  },
+  {
+   "seed": 10075,
+   "tone": "dark",
+   "px_per_cm": 60.8,
+   "true_cm2": 0.94,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 186.53,
+   "coin_found": true
+  },
+  {
+   "seed": 10076,
+   "tone": "dark",
+   "px_per_cm": 22.4,
+   "true_cm2": 1.22,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1379.81,
+   "coin_found": true
+  },
+  {
+   "seed": 10077,
+   "tone": "light",
+   "px_per_cm": 30.9,
+   "true_cm2": 0.98,
+   "coin": 1.13,
+   "fallback": 0.6,
+   "oracle": 0.93,
+   "coin_found": true
+  },
+  {
+   "seed": 10078,
+   "tone": "tan",
+   "px_per_cm": 49.9,
+   "true_cm2": 6.44,
+   "coin": 8.2,
+   "fallback": 96.87,
+   "oracle": 6.78,
+   "coin_found": true
+  },
+  {
+   "seed": 10079,
+   "tone": "medium",
+   "px_per_cm": 43.9,
+   "true_cm2": 1.16,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 357.55,
+   "coin_found": true
+  },
+  {
+   "seed": 10080,
+   "tone": "light",
+   "px_per_cm": 36.3,
+   "true_cm2": 1.18,
+   "coin": 1.41,
+   "fallback": 1.04,
+   "oracle": 1.17,
+   "coin_found": true
+  },
+  {
+   "seed": 10081,
+   "tone": "fair",
+   "px_per_cm": 64.8,
+   "true_cm2": 2.12,
+   "coin": 2.64,
+   "fallback": 7.55,
+   "oracle": 2.16,
+   "coin_found": true
+  },
+  {
+   "seed": 10082,
+   "tone": "light",
+   "px_per_cm": 73.0,
+   "true_cm2": 2.85,
+   "coin": 3.39,
+   "fallback": 10.22,
+   "oracle": 2.84,
+   "coin_found": true
+  },
+  {
+   "seed": 10083,
+   "tone": "tan",
+   "px_per_cm": 58.8,
+   "true_cm2": 14.28,
+   "coin": 17.29,
+   "fallback": 38.91,
+   "oracle": 14.8,
+   "coin_found": true
+  },
+  {
+   "seed": 10084,
+   "tone": "dark",
+   "px_per_cm": 22.1,
+   "true_cm2": 4.32,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1412.56,
+   "coin_found": true
+  },
+  {
+   "seed": 10085,
+   "tone": "dark",
+   "px_per_cm": 46.3,
+   "true_cm2": 4.63,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 321.97,
+   "coin_found": true
+  },
+  {
+   "seed": 10086,
+   "tone": "light",
+   "px_per_cm": 31.8,
+   "true_cm2": 0.84,
+   "coin": 0.99,
+   "fallback": 0.56,
+   "oracle": 0.82,
+   "coin_found": true
+  },
+  {
+   "seed": 10087,
+   "tone": "dark",
+   "px_per_cm": 71.9,
+   "true_cm2": 2.05,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 133.39,
+   "coin_found": true
+  },
+  {
+   "seed": 10088,
+   "tone": "light",
+   "px_per_cm": 23.9,
+   "true_cm2": 2.76,
+   "coin": 2.6,
+   "fallback": 1.08,
+   "oracle": 2.78,
+   "coin_found": true
+  },
+  {
+   "seed": 10089,
+   "tone": "light",
+   "px_per_cm": 41.9,
+   "true_cm2": 1.56,
+   "coin": 1.48,
+   "fallback": 1.84,
+   "oracle": 1.55,
+   "coin_found": true
+  },
+  {
+   "seed": 10090,
+   "tone": "light",
+   "px_per_cm": 43.4,
+   "true_cm2": 1.35,
+   "coin": 1.65,
+   "fallback": 1.74,
+   "oracle": 1.37,
+   "coin_found": true
+  },
+  {
+   "seed": 10091,
+   "tone": "medium",
+   "px_per_cm": 35.7,
+   "true_cm2": 10.88,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 539.08,
+   "coin_found": true
+  },
+  {
+   "seed": 10092,
+   "tone": "tan",
+   "px_per_cm": 43.5,
+   "true_cm2": 23.07,
+   "coin": 29.87,
+   "fallback": 182.8,
+   "oracle": 23.7,
+   "coin_found": true
+  },
+  {
+   "seed": 10093,
+   "tone": "light",
+   "px_per_cm": 68.6,
+   "true_cm2": 12.19,
+   "coin": 14.54,
+   "fallback": 93.33,
+   "oracle": 12.12,
+   "coin_found": true
+  },
+  {
+   "seed": 10094,
+   "tone": "medium",
+   "px_per_cm": 27.7,
+   "true_cm2": 17.11,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 512.08,
+   "coin_found": true
+  },
+  {
+   "seed": 10095,
+   "tone": "light",
+   "px_per_cm": 38.3,
+   "true_cm2": 6.71,
+   "coin": 8.65,
+   "fallback": 7.86,
+   "oracle": 6.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10096,
+   "tone": "medium",
+   "px_per_cm": 20.6,
+   "true_cm2": 19.28,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1424.49,
+   "coin_found": true
+  },
+  {
+   "seed": 10097,
+   "tone": "light",
+   "px_per_cm": 35.7,
+   "true_cm2": 23.49,
+   "coin": 28.97,
+   "fallback": 4.15,
+   "oracle": 23.44,
+   "coin_found": true
+  },
+  {
+   "seed": 10098,
+   "tone": "tan",
+   "px_per_cm": 19.8,
+   "true_cm2": 1.33,
+   "coin": 1.96,
+   "fallback": 0.44,
+   "oracle": 1.64,
+   "coin_found": true
+  },
+  {
+   "seed": 10099,
+   "tone": "medium",
+   "px_per_cm": 22.4,
+   "true_cm2": 17.2,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1364.04,
+   "coin_found": true
+  },
+  {
+   "seed": 10100,
+   "tone": "medium",
+   "px_per_cm": 23.5,
+   "true_cm2": 21.97,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1252.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10101,
+   "tone": "fair",
+   "px_per_cm": 67.2,
+   "true_cm2": 6.91,
+   "coin": 8.3,
+   "fallback": 8.3,
+   "oracle": 7.03,
+   "coin_found": true
+  },
+  {
+   "seed": 10102,
+   "tone": "fair",
+   "px_per_cm": 44.5,
+   "true_cm2": 11.34,
+   "coin": 13.31,
+   "fallback": 45.66,
+   "oracle": 11.42,
+   "coin_found": true
+  },
+  {
+   "seed": 10103,
+   "tone": "medium",
+   "px_per_cm": 41.1,
+   "true_cm2": 15.6,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 276.56,
+   "coin_found": true
+  },
+  {
+   "seed": 10104,
+   "tone": "tan",
+   "px_per_cm": 35.8,
+   "true_cm2": 2.32,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 538.9,
+   "coin_found": true
+  },
+  {
+   "seed": 10105,
+   "tone": "light",
+   "px_per_cm": 26.5,
+   "true_cm2": 4.73,
+   "coin": 6.23,
+   "fallback": 6.7,
+   "oracle": 4.74,
+   "coin_found": true
+  },
+  {
+   "seed": 10106,
+   "tone": "fair",
+   "px_per_cm": 30.1,
+   "true_cm2": 0.65,
+   "coin": 0.89,
+   "fallback": 0.45,
+   "oracle": 0.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10107,
+   "tone": "light",
+   "px_per_cm": 47.5,
+   "true_cm2": 4.83,
+   "coin": 5.85,
+   "fallback": 27.45,
+   "oracle": 4.76,
+   "coin_found": true
+  },
+  {
+   "seed": 10108,
+   "tone": "dark",
+   "px_per_cm": 64.6,
+   "true_cm2": 8.91,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 164.98,
+   "coin_found": true
+  },
+  {
+   "seed": 10109,
+   "tone": "dark",
+   "px_per_cm": 35.9,
+   "true_cm2": 7.6,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 534.07,
+   "coin_found": true
+  },
+  {
+   "seed": 10110,
+   "tone": "tan",
+   "px_per_cm": 73.3,
+   "true_cm2": 8.25,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 128.36,
+   "coin_found": true
+  },
+  {
+   "seed": 10111,
+   "tone": "fair",
+   "px_per_cm": 28.6,
+   "true_cm2": 9.45,
+   "coin": 12.02,
+   "fallback": 39.98,
+   "oracle": 9.63,
+   "coin_found": true
+  },
+  {
+   "seed": 10112,
+   "tone": "light",
+   "px_per_cm": 31.3,
+   "true_cm2": 23.59,
+   "coin": 23.6,
+   "fallback": 12.13,
+   "oracle": 23.66,
+   "coin_found": true
+  },
+  {
+   "seed": 10113,
+   "tone": "medium",
+   "px_per_cm": 60.8,
+   "true_cm2": 2.01,
+   "coin": 3.16,
+   "fallback": 6.7,
+   "oracle": 2.68,
+   "coin_found": true
+  },
+  {
+   "seed": 10114,
+   "tone": "light",
+   "px_per_cm": 38.7,
+   "true_cm2": 1.52,
+   "coin": 1.89,
+   "fallback": 1.53,
+   "oracle": 1.52,
+   "coin_found": true
+  },
+  {
+   "seed": 10115,
+   "tone": "dark",
+   "px_per_cm": 22.9,
+   "true_cm2": 1.73,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1316.18,
+   "coin_found": true
+  },
+  {
+   "seed": 10116,
+   "tone": "light",
+   "px_per_cm": 27.4,
+   "true_cm2": 3.57,
+   "coin": 4.3,
+   "fallback": 5.72,
+   "oracle": 3.49,
+   "coin_found": true
+  },
+  {
+   "seed": 10117,
+   "tone": "tan",
+   "px_per_cm": 26.4,
+   "true_cm2": 9.1,
+   "coin": 20.62,
+   "fallback": 7.97,
+   "oracle": 16.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10118,
+   "tone": "medium",
+   "px_per_cm": 23.5,
+   "true_cm2": 11.42,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1246.01,
+   "coin_found": true
+  },
+  {
+   "seed": 10119,
+   "tone": "tan",
+   "px_per_cm": 57.1,
+   "true_cm2": 20.14,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 211.57,
+   "coin_found": true
+  },
+  {
+   "seed": 10120,
+   "tone": "tan",
+   "px_per_cm": 34.1,
+   "true_cm2": 3.8,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 591.84,
+   "coin_found": true
+  },
+  {
+   "seed": 10121,
+   "tone": "dark",
+   "px_per_cm": 44.8,
+   "true_cm2": 18.51,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 342.48,
+   "coin_found": true
+  },
+  {
+   "seed": 10122,
+   "tone": "fair",
+   "px_per_cm": 67.1,
+   "true_cm2": 1.69,
+   "coin": 1.73,
+   "fallback": 4.94,
+   "oracle": 1.72,
+   "coin_found": true
+  },
+  {
+   "seed": 10123,
+   "tone": "medium",
+   "px_per_cm": 76.8,
+   "true_cm2": 1.15,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 115.53,
+   "coin_found": true
+  },
+  {
+   "seed": 10124,
+   "tone": "light",
+   "px_per_cm": 26.1,
+   "true_cm2": 1.56,
+   "coin": 1.95,
+   "fallback": 0.7,
+   "oracle": 1.53,
+   "coin_found": true
+  },
+  {
+   "seed": 10125,
+   "tone": "medium",
+   "px_per_cm": 24.4,
+   "true_cm2": 15.68,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1157.94,
+   "coin_found": true
+  },
+  {
+   "seed": 10126,
+   "tone": "medium",
+   "px_per_cm": 29.4,
+   "true_cm2": 13.9,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 788.33,
+   "coin_found": true
+  },
+  {
+   "seed": 10127,
+   "tone": "fair",
+   "px_per_cm": 36.6,
+   "true_cm2": 1.17,
+   "coin": 1.42,
+   "fallback": 1.1,
+   "oracle": 1.21,
+   "coin_found": true
+  },
+  {
+   "seed": 10128,
+   "tone": "dark",
+   "px_per_cm": 44.5,
+   "true_cm2": 3.53,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 348.83,
+   "coin_found": true
+  },
+  {
+   "seed": 10129,
+   "tone": "dark",
+   "px_per_cm": 34.6,
+   "true_cm2": 2.86,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 574.37,
+   "coin_found": true
+  },
+  {
+   "seed": 10130,
+   "tone": "light",
+   "px_per_cm": 56.4,
+   "true_cm2": 2.21,
+   "coin": 2.61,
+   "fallback": 3.18,
+   "oracle": 2.21,
+   "coin_found": true
+  },
+  {
+   "seed": 10131,
+   "tone": "dark",
+   "px_per_cm": 55.6,
+   "true_cm2": 2.57,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 221.86,
+   "coin_found": true
+  },
+  {
+   "seed": 10132,
+   "tone": "tan",
+   "px_per_cm": 48.2,
+   "true_cm2": 12.43,
+   "coin": 15.64,
+   "fallback": 26.14,
+   "oracle": 12.84,
+   "coin_found": true
+  },
+  {
+   "seed": 10133,
+   "tone": "dark",
+   "px_per_cm": 60.2,
+   "true_cm2": 3.36,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 190.14,
+   "coin_found": true
+  },
+  {
+   "seed": 10134,
+   "tone": "fair",
+   "px_per_cm": 35.0,
+   "true_cm2": 14.22,
+   "coin": 13.46,
+   "fallback": 10.02,
+   "oracle": 14.46,
+   "coin_found": true
+  },
+  {
+   "seed": 10135,
+   "tone": "medium",
+   "px_per_cm": 27.5,
+   "true_cm2": 2.59,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 902.49,
+   "coin_found": true
+  },
+  {
+   "seed": 10136,
+   "tone": "tan",
+   "px_per_cm": 70.0,
+   "true_cm2": 7.78,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 140.66,
+   "coin_found": true
+  },
+  {
+   "seed": 10137,
+   "tone": "medium",
+   "px_per_cm": 40.7,
+   "true_cm2": 2.57,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 416.24,
+   "coin_found": true
+  },
+  {
+   "seed": 10138,
+   "tone": "tan",
+   "px_per_cm": 56.1,
+   "true_cm2": 2.51,
+   "coin": 3.57,
+   "fallback": 6.51,
+   "oracle": 3.06,
+   "coin_found": true
+  },
+  {
+   "seed": 10139,
+   "tone": "fair",
+   "px_per_cm": 23.6,
+   "true_cm2": 6.44,
+   "coin": 8.68,
+   "fallback": 2.49,
+   "oracle": 6.61,
+   "coin_found": true
+  },
+  {
+   "seed": 10140,
+   "tone": "tan",
+   "px_per_cm": 44.2,
+   "true_cm2": 6.82,
+   "coin": 9.46,
+   "fallback": 10.44,
+   "oracle": 7.92,
+   "coin_found": true
+  },
+  {
+   "seed": 10141,
+   "tone": "medium",
+   "px_per_cm": 33.0,
+   "true_cm2": 16.05,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 634.12,
+   "coin_found": true
+  },
+  {
+   "seed": 10142,
+   "tone": "dark",
+   "px_per_cm": 74.1,
+   "true_cm2": 14.12,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 125.55,
+   "coin_found": true
+  },
+  {
+   "seed": 10143,
+   "tone": "light",
+   "px_per_cm": 48.6,
+   "true_cm2": 14.65,
+   "coin": 14.65,
+   "fallback": 28.9,
+   "oracle": 14.69,
+   "coin_found": true
+  },
+  {
+   "seed": 10144,
+   "tone": "tan",
+   "px_per_cm": 52.0,
+   "true_cm2": 2.7,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 254.9,
+   "coin_found": true
+  },
+  {
+   "seed": 10145,
+   "tone": "medium",
+   "px_per_cm": 50.9,
+   "true_cm2": 7.55,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 185.14,
+   "coin_found": true
+  },
+  {
+   "seed": 10146,
+   "tone": "dark",
+   "px_per_cm": 24.2,
+   "true_cm2": 2.63,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1181.27,
+   "coin_found": true
+  },
+  {
+   "seed": 10147,
+   "tone": "medium",
+   "px_per_cm": 26.7,
+   "true_cm2": 8.17,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 968.37,
+   "coin_found": true
+  },
+  {
+   "seed": 10148,
+   "tone": "medium",
+   "px_per_cm": 23.3,
+   "true_cm2": 8.29,
+   "coin": 77.88,
+   "fallback": 24.19,
+   "oracle": 65.97,
+   "coin_found": true
+  },
+  {
+   "seed": 10149,
+   "tone": "medium",
+   "px_per_cm": 74.8,
+   "true_cm2": 2.15,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 9.51,
+   "coin_found": true
+  },
+  {
+   "seed": 10150,
+   "tone": "tan",
+   "px_per_cm": 63.9,
+   "true_cm2": 12.11,
+   "coin": 15.36,
+   "fallback": 34.58,
+   "oracle": 12.51,
+   "coin_found": true
+  },
+  {
+   "seed": 10151,
+   "tone": "fair",
+   "px_per_cm": 70.5,
+   "true_cm2": 1.32,
+   "coin": 1.33,
+   "fallback": 4.51,
+   "oracle": 1.34,
+   "coin_found": true
+  },
+  {
+   "seed": 10152,
+   "tone": "light",
+   "px_per_cm": 72.4,
+   "true_cm2": 5.3,
+   "coin": 5.23,
+   "fallback": 9.58,
+   "oracle": 5.25,
+   "coin_found": true
+  },
+  {
+   "seed": 10153,
+   "tone": "light",
+   "px_per_cm": 44.7,
+   "true_cm2": 0.79,
+   "coin": 0.79,
+   "fallback": 1.06,
+   "oracle": 0.78,
+   "coin_found": true
+  },
+  {
+   "seed": 10154,
+   "tone": "medium",
+   "px_per_cm": 69.7,
+   "true_cm2": 17.32,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 141.81,
+   "coin_found": true
+  },
+  {
+   "seed": 10155,
+   "tone": "dark",
+   "px_per_cm": 19.5,
+   "true_cm2": 17.87,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1819.73,
+   "coin_found": true
+  },
+  {
+   "seed": 10156,
+   "tone": "tan",
+   "px_per_cm": 34.9,
+   "true_cm2": 1.0,
+   "coin": 1.41,
+   "fallback": 0.98,
+   "oracle": 1.19,
+   "coin_found": true
+  },
+  {
+   "seed": 10157,
+   "tone": "medium",
+   "px_per_cm": 30.7,
+   "true_cm2": 15.43,
+   "coin": 32.74,
+   "fallback": 0.0,
+   "oracle": 27.23,
+   "coin_found": true
+  },
+  {
+   "seed": 10158,
+   "tone": "light",
+   "px_per_cm": 50.7,
+   "true_cm2": 15.94,
+   "coin": 19.19,
+   "fallback": 43.96,
+   "oracle": 15.9,
+   "coin_found": true
+  },
+  {
+   "seed": 10159,
+   "tone": "light",
+   "px_per_cm": 30.1,
+   "true_cm2": 1.16,
+   "coin": 1.43,
+   "fallback": 0.67,
+   "oracle": 1.1,
+   "coin_found": true
+  },
+  {
+   "seed": 10160,
+   "tone": "tan",
+   "px_per_cm": 37.6,
+   "true_cm2": 1.98,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 485.01,
+   "coin_found": true
+  },
+  {
+   "seed": 10161,
+   "tone": "medium",
+   "px_per_cm": 46.7,
+   "true_cm2": 4.74,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 315.91,
+   "coin_found": true
+  },
+  {
+   "seed": 10162,
+   "tone": "tan",
+   "px_per_cm": 43.4,
+   "true_cm2": 7.38,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 363.61,
+   "coin_found": true
+  },
+  {
+   "seed": 10163,
+   "tone": "dark",
+   "px_per_cm": 48.8,
+   "true_cm2": 1.03,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 289.32,
+   "coin_found": true
+  },
+  {
+   "seed": 10164,
+   "tone": "light",
+   "px_per_cm": 43.0,
+   "true_cm2": 21.06,
+   "coin": 20.29,
+   "fallback": 41.63,
+   "oracle": 20.91,
+   "coin_found": true
+  },
+  {
+   "seed": 10165,
+   "tone": "medium",
+   "px_per_cm": 21.8,
+   "true_cm2": 10.06,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1452.66,
+   "coin_found": true
+  },
+  {
+   "seed": 10166,
+   "tone": "medium",
+   "px_per_cm": 64.9,
+   "true_cm2": 12.61,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 163.4,
+   "coin_found": true
+  },
+  {
+   "seed": 10167,
+   "tone": "dark",
+   "px_per_cm": 21.0,
+   "true_cm2": 11.76,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1557.25,
+   "coin_found": true
+  },
+  {
+   "seed": 10168,
+   "tone": "tan",
+   "px_per_cm": 45.3,
+   "true_cm2": 5.02,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 332.78,
+   "coin_found": true
+  },
+  {
+   "seed": 10169,
+   "tone": "dark",
+   "px_per_cm": 41.3,
+   "true_cm2": 4.55,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 403.56,
+   "coin_found": true
+  },
+  {
+   "seed": 10170,
+   "tone": "medium",
+   "px_per_cm": 39.8,
+   "true_cm2": 3.73,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 434.8,
+   "coin_found": true
+  },
+  {
+   "seed": 10171,
+   "tone": "medium",
+   "px_per_cm": 61.3,
+   "true_cm2": 3.89,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 183.15,
+   "coin_found": true
+  },
+  {
+   "seed": 10172,
+   "tone": "medium",
+   "px_per_cm": 19.0,
+   "true_cm2": 0.95,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1890.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10173,
+   "tone": "medium",
+   "px_per_cm": 73.1,
+   "true_cm2": 17.47,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 51.11,
+   "coin_found": true
+  },
+  {
+   "seed": 10174,
+   "tone": "light",
+   "px_per_cm": 49.1,
+   "true_cm2": 1.96,
+   "coin": 2.25,
+   "fallback": 6.25,
+   "oracle": 1.92,
+   "coin_found": true
+  },
+  {
+   "seed": 10175,
+   "tone": "fair",
+   "px_per_cm": 72.3,
+   "true_cm2": 1.85,
+   "coin": 2.21,
+   "fallback": 6.5,
+   "oracle": 1.84,
+   "coin_found": true
+  },
+  {
+   "seed": 10176,
+   "tone": "tan",
+   "px_per_cm": 21.6,
+   "true_cm2": 2.7,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1471.99,
+   "coin_found": true
+  },
+  {
+   "seed": 10177,
+   "tone": "dark",
+   "px_per_cm": 42.0,
+   "true_cm2": 0.7,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 391.31,
+   "coin_found": true
+  },
+  {
+   "seed": 10178,
+   "tone": "light",
+   "px_per_cm": 27.1,
+   "true_cm2": 8.98,
+   "coin": 8.45,
+   "fallback": 4.24,
+   "oracle": 9.04,
+   "coin_found": true
+  },
+  {
+   "seed": 10179,
+   "tone": "fair",
+   "px_per_cm": 50.3,
+   "true_cm2": 0.74,
+   "coin": 0.94,
+   "fallback": 1.31,
+   "oracle": 0.76,
+   "coin_found": true
+  },
+  {
+   "seed": 10180,
+   "tone": "light",
+   "px_per_cm": 43.5,
+   "true_cm2": 2.0,
+   "coin": 2.37,
+   "fallback": 2.51,
+   "oracle": 1.96,
+   "coin_found": true
+  },
+  {
+   "seed": 10181,
+   "tone": "fair",
+   "px_per_cm": 39.5,
+   "true_cm2": 1.11,
+   "coin": 1.46,
+   "fallback": 1.24,
+   "oracle": 1.17,
+   "coin_found": true
+  },
+  {
+   "seed": 10182,
+   "tone": "medium",
+   "px_per_cm": 21.9,
+   "true_cm2": 1.68,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 1014.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10183,
+   "tone": "light",
+   "px_per_cm": 21.5,
+   "true_cm2": 1.64,
+   "coin": 2.1,
+   "fallback": 0.51,
+   "oracle": 1.63,
+   "coin_found": true
+  },
+  {
+   "seed": 10184,
+   "tone": "dark",
+   "px_per_cm": 32.6,
+   "true_cm2": 3.86,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 650.2,
+   "coin_found": true
+  },
+  {
+   "seed": 10185,
+   "tone": "light",
+   "px_per_cm": 42.6,
+   "true_cm2": 6.32,
+   "coin": 7.22,
+   "fallback": 21.22,
+   "oracle": 6.22,
+   "coin_found": true
+  },
+  {
+   "seed": 10186,
+   "tone": "medium",
+   "px_per_cm": 27.7,
+   "true_cm2": 2.11,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 895.79,
+   "coin_found": true
+  },
+  {
+   "seed": 10187,
+   "tone": "tan",
+   "px_per_cm": 26.9,
+   "true_cm2": 12.06,
+   "coin": 15.2,
+   "fallback": 6.28,
+   "oracle": 12.87,
+   "coin_found": true
+  },
+  {
+   "seed": 10188,
+   "tone": "fair",
+   "px_per_cm": 46.8,
+   "true_cm2": 9.87,
+   "coin": 9.64,
+   "fallback": 5.92,
+   "oracle": 10.05,
+   "coin_found": true
+  },
+  {
+   "seed": 10189,
+   "tone": "tan",
+   "px_per_cm": 57.1,
+   "true_cm2": 5.44,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 211.57,
+   "coin_found": true
+  },
+  {
+   "seed": 10190,
+   "tone": "fair",
+   "px_per_cm": 57.7,
+   "true_cm2": 4.63,
+   "coin": 5.32,
+   "fallback": 4.59,
+   "oracle": 4.58,
+   "coin_found": true
+  },
+  {
+   "seed": 10191,
+   "tone": "medium",
+   "px_per_cm": 41.5,
+   "true_cm2": 3.85,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 400.17,
+   "coin_found": true
+  },
+  {
+   "seed": 10192,
+   "tone": "fair",
+   "px_per_cm": 71.4,
+   "true_cm2": 10.8,
+   "coin": 11.04,
+   "fallback": 8.0,
+   "oracle": 10.9,
+   "coin_found": true
+  },
+  {
+   "seed": 10193,
+   "tone": "light",
+   "px_per_cm": 65.8,
+   "true_cm2": 2.12,
+   "coin": 2.15,
+   "fallback": 6.15,
+   "oracle": 2.1,
+   "coin_found": true
+  },
+  {
+   "seed": 10194,
+   "tone": "fair",
+   "px_per_cm": 28.3,
+   "true_cm2": 7.63,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 856.46,
+   "coin_found": true
+  },
+  {
+   "seed": 10195,
+   "tone": "tan",
+   "px_per_cm": 32.2,
+   "true_cm2": 1.18,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 626.49,
+   "coin_found": true
+  },
+  {
+   "seed": 10196,
+   "tone": "tan",
+   "px_per_cm": 53.3,
+   "true_cm2": 1.25,
+   "coin": 0.0,
+   "fallback": 0.0,
+   "oracle": 243.02,
+   "coin_found": true
+  },
+  {
+   "seed": 10197,
+   "tone": "light",
+   "px_per_cm": 22.6,
+   "true_cm2": 10.44,
+   "coin": 13.45,
+   "fallback": 3.56,
+   "oracle": 10.28,
+   "coin_found": true
+  },
+  {
+   "seed": 10198,
+   "tone": "tan",
+   "px_per_cm": 72.0,
+   "true_cm2": 11.51,
+   "coin": 14.07,
+   "fallback": 42.41,
+   "oracle": 12.11,
+   "coin_found": true
+  },
+  {
+   "seed": 10199,
+   "tone": "tan",
+   "px_per_cm": 34.8,
+   "true_cm2": 1.5,
+   "coin": 2.78,
+   "fallback": 1.94,
+   "oracle": 2.38,
+   "coin_found": true
+  }
+ ]
+}
