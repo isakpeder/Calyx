@@ -12,8 +12,32 @@ orders patients on the doctor dashboard.
 
 ```bash
 python -m evals.triage.generate_cases           # only when the rubric changes
-python -m evals.triage.run_eval --label <name>  # defaults to the test split
+python -m evals.triage.tune                      # pick thresholds on dev
+python -m evals.triage.run_eval --rules-only     # baseline (original engine)
+python -m evals.triage.run_eval                  # rules + knowledge graph
 ```
+
+## Results
+
+Held-out `test` split, 350 cases:
+
+| Metric | Rules only | Rules + knowledge graph |
+|---|---|---|
+| Accuracy | 74.3% | **79.1%** |
+| Ranking accuracy | 88.0% | **93.7%** |
+| Macro F1 | 0.710 | **0.775** |
+| Critical recall | 64.0% | 66.7% |
+
+Dev split (used for tuning): 78.0% → 84.0% accuracy. The dev/test gap is
+expected overfitting from threshold tuning.
+
+Ranking accuracy is the share of patient pairs with different expected
+priority that the dashboard sort (priority, then risk score) puts in the
+right order.
+
+The graph mostly fixes under-triage of HIGH (71% → 87% recall) and LOW
+(34% → 56%) cases. It does little for CRITICAL: 20 of 75 critical cases
+are still rated HIGH, mainly ischemic wounds with 5–15% necrosis.
 
 ## Protocol
 

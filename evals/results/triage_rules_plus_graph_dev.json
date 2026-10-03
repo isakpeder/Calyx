@@ -1,0 +1,45 @@
+{
+  "n_cases": 150,
+  "accuracy": 0.84,
+  "critical_recall": 0.789,
+  "macro_f1": 0.813,
+  "ranking_accuracy": 0.943,
+  "per_class": {
+    "CRITICAL": {
+      "support": 38,
+      "recall": 0.789,
+      "f1": 0.882
+    },
+    "HIGH": {
+      "support": 33,
+      "recall": 0.939,
+      "f1": 0.827
+    },
+    "MEDIUM": {
+      "support": 31,
+      "recall": 0.839,
+      "f1": 0.881
+    },
+    "LOW": {
+      "support": 15,
+      "recall": 0.533,
+      "f1": 0.615
+    },
+    "OK": {
+      "support": 33,
+      "recall": 0.939,
+      "f1": 0.861
+    }
+  },
+  "top_errors": {
+    "LOW->OK": 6,
+    "CRITICAL->HIGH": 6,
+    "HIGH->MEDIUM": 2,
+    "OK->HIGH": 2,
+    "MEDIUM->HIGH": 2,
+    "MEDIUM->LOW": 2,
+    "CRITICAL->LOW": 1,
+    "CRITICAL->OK": 1
+  },
+  "split": "dev"
+}
