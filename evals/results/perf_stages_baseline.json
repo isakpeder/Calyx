@@ -1,0 +1,39 @@
+{
+  "machine": "arm64 arm",
+  "sizes": {
+    "960x720": {
+      "n": 10,
+      "total_ms": {
+        "p50": 79.8,
+        "p95": 155.5
+      },
+      "stage_ms_p50": {
+        "decode": 1.3,
+        "calibrate": 7.4,
+        "wound_mask": 15.2,
+        "area": 0.1,
+        "tissue_kmeans": 27.9,
+        "overlay_draw": 3.9,
+        "encode": 1.2,
+        "other": 24.9
+      }
+    },
+    "12MP": {
+      "n": 10,
+      "total_ms": {
+        "p50": 656.9,
+        "p95": 1817.2
+      },
+      "stage_ms_p50": {
+        "decode": 18.4,
+        "calibrate": 85.8,
+        "wound_mask": 228.9,
+        "area": 0.7,
+        "tissue_kmeans": 116.3,
+        "overlay_draw": 57.3,
+        "encode": 17.6,
+        "other": 124.8
+      }
+    }
+  }
+}
