@@ -313,6 +313,7 @@ def get_doctor_patients(doctor_id: str):
                     "ryb_ratios": latest["ryb_ratios"],
                     "scan_date":  latest["date"],
                     "alerts":     kg["alerts"],
+                    "risk_score": kg["risk_score"],
                 }
             result.append({**_safe_patient(p), "latest_summary": summary})
     return result

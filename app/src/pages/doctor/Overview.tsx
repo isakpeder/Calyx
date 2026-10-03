@@ -2,9 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { addPatientToDoctor, getAllPatients, getDoctorPatients, removePatientFromDoctor } from '../../api/client'
 import AlertBadge from '../../components/AlertBadge'
+import { byUrgency, PRIORITY_ORDER } from '../../priority'
 import type { Doctor, Patient, PatientWithSummary, Priority } from '../../types'
-
-const PRIORITY_ORDER: Priority[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'OK']
 
 interface Props {
   doctor: Doctor
@@ -21,13 +20,7 @@ export default function Overview({ doctor, onSelectPatient }: Props) {
 
   const fetchAssigned = () =>
     getDoctorPatients(doctor.doctor_id)
-      .then(data => setPatients(
-        [...data].sort((a, b) => {
-          const pa = a.latest_summary?.priority ?? 'OK'
-          const pb = b.latest_summary?.priority ?? 'OK'
-          return PRIORITY_ORDER.indexOf(pa) - PRIORITY_ORDER.indexOf(pb)
-        })
-      ))
+      .then(data => setPatients([...data].sort(byUrgency)))
       .finally(() => setLoading(false))
 
   useEffect(() => { fetchAssigned() }, [doctor.doctor_id])

@@ -38,6 +38,7 @@ export interface AnalysisResult {
   reasoning: string
   active_risk_factors: string[]
   recommended_action: string
+  risk_score: number
   area_cm2: number
   area_delta: number
   ryb_ratios: { red: number; yellow: number; black: number }
@@ -54,5 +55,6 @@ export interface PatientWithSummary extends Patient {
     ryb_ratios: { red: number; yellow: number; black: number }
     scan_date: string
     alerts: string[]
+    risk_score: number
   } | null
 }

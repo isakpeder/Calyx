@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { getDoctorPatients } from '../../api/client'
 import AlertBadge from '../../components/AlertBadge'
+import { byUrgency } from '../../priority'
 import type { Doctor, PatientWithSummary, Priority } from '../../types'
 
 const URGENT: Priority[] = ['CRITICAL', 'HIGH']
@@ -17,7 +18,9 @@ export default function Alerts({ doctor, onSelectPatient }: Props) {
 
   useEffect(() => {
     getDoctorPatients(doctor.doctor_id)
-      .then(data => setPatients(data.filter(p => URGENT.includes(p.latest_summary?.priority as Priority))))
+      .then(data => setPatients(
+        data.filter(p => URGENT.includes(p.latest_summary?.priority as Priority)).sort(byUrgency)
+      ))
       .finally(() => setLoading(false))
   }, [doctor.doctor_id])
 
