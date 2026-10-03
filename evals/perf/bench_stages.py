@@ -49,6 +49,7 @@ def _stage_timer():
         ("detect_wound_mask", "wound_mask"),
         ("compute_wound_area", "area"),
         ("ryb_segment", "tissue_kmeans"),
+        ("_ryb_cluster", "tissue_kmeans"),
         ("draw_overlay", "overlay_draw"),
     ]:
         if hasattr(vision, name):

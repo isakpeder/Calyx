@@ -43,6 +43,17 @@ COIN_MAX_SATURATION: int = 60
 # more saturated skin tones pass as wound tissue.
 SKIN_DELTA_E_MIN: float = 25.0
 
+# Uploads larger than this (long side, px) are downscaled before analysis.
+# Coin calibration is measured on the same downscaled image, so cm² results
+# are unchanged; a 12 MP phone photo is ~9x fewer pixels at 1280 px.
+MAX_ANALYSIS_SIDE: int = 1280
+
+# K-Means is fit on at most this many wound pixels, then every pixel is
+# labelled with the fitted centroids.
+KMEANS_SAMPLE_SIZE: int = 20_000
+
+TISSUE_LABELS = ("red", "yellow", "black")
+
 # Fallback scale when no coin is found: ~38 px/cm on a typical smartphone
 FALLBACK_CM_PER_PX: float = 0.026
 
@@ -279,13 +290,13 @@ def _classify_cluster_hsv(hsv_centroid: np.ndarray) -> str:
     return "yellow"
 
 
-def ryb_segment(img: np.ndarray, wound_mask: np.ndarray) -> dict[str, float]:
+def _ryb_cluster(img: np.ndarray, wound_mask: np.ndarray) -> tuple[dict[str, float], np.ndarray | None]:
     """
-    Run K-Means (k=3) on wound pixels to separate tissue into
-    Granulation (red), Slough (yellow), and Necrosis (black).
+    K-Means (k=3) tissue clustering shared by ryb_segment and the overlay.
 
-    Returns percentages summing to 100.0:
-      {"red": float, "yellow": float, "black": float}
+    Returns (ratios, pixel_labels) where pixel_labels holds one tissue label
+    per wound pixel in np.where(wound_mask == 255) order, or None when there
+    are too few wound pixels.
     """
     if img.shape[:2] != wound_mask.shape:
         raise ValueError(
@@ -296,24 +307,37 @@ def ryb_segment(img: np.ndarray, wound_mask: np.ndarray) -> dict[str, float]:
 
     if len(wound_pixels) < 30:
         # Not enough data — return safe defaults
-        return {"red": 0.0, "yellow": 0.0, "black": 0.0}
+        return {"red": 0.0, "yellow": 0.0, "black": 0.0}, None
 
     # Convert wound pixels to HSV for perceptually meaningful clustering
     wound_bgr = wound_pixels.reshape(-1, 1, 3).astype(np.uint8)
-    wound_hsv = cv2.cvtColor(wound_bgr, cv2.COLOR_BGR2HSV).reshape(-1, 3)
+    wound_hsv = cv2.cvtColor(wound_bgr, cv2.COLOR_BGR2HSV).reshape(-1, 3).astype(np.float32)
 
-    kmeans = KMeans(n_clusters=3, n_init=10, random_state=42)
-    labels = kmeans.fit_predict(wound_hsv.astype(np.float32))
-    centroids = kmeans.cluster_centers_
+    # Fit on a fixed-seed sample, then label every pixel
+    sample = wound_hsv
+    if len(wound_hsv) > KMEANS_SAMPLE_SIZE:
+        idx = np.random.default_rng(42).choice(len(wound_hsv), KMEANS_SAMPLE_SIZE, replace=False)
+        sample = wound_hsv[idx]
+    kmeans = KMeans(n_clusters=3, n_init=10, random_state=42).fit(sample)
+    labels = kmeans.predict(wound_hsv)
 
     # Classify each centroid then tally pixel counts per tissue label
-    cluster_labels = [_classify_cluster_hsv(c) for c in centroids]
-    counts: dict[str, int] = {"red": 0, "yellow": 0, "black": 0}
-    for cluster_id in labels:
-        counts[cluster_labels[cluster_id]] += 1
-
+    cluster_tissue = np.array([_classify_cluster_hsv(c) for c in kmeans.cluster_centers_])
+    pixel_labels = cluster_tissue[labels]
     total = len(labels)
-    return {k: round(v / total * 100, 1) for k, v in counts.items()}
+    ratios = {t: round(float(np.count_nonzero(pixel_labels == t)) / total * 100, 1) for t in TISSUE_LABELS}
+    return ratios, pixel_labels
+
+
+def ryb_segment(img: np.ndarray, wound_mask: np.ndarray) -> dict[str, float]:
+    """
+    Run K-Means (k=3) on wound pixels to separate tissue into
+    Granulation (red), Slough (yellow), and Necrosis (black).
+
+    Returns percentages summing to 100.0:
+      {"red": float, "yellow": float, "black": float}
+    """
+    return _ryb_cluster(img, wound_mask)[0]
 
 
 # ---------------------------------------------------------------------------
@@ -342,10 +366,10 @@ def draw_overlay(
     # --- Colour the wound area ---
     if ryb_pixel_labels is not None:
         # Pixel-accurate colouring
-        wound_coords = np.where(wound_mask == 255)
-        for y, x, label in zip(wound_coords[0], wound_coords[1], ryb_pixel_labels):
-            colour = {"red": _COLOUR_RED, "yellow": _COLOUR_YELLOW, "black": _COLOUR_BLACK}[label]
-            out[y, x] = colour
+        ys, xs = np.where(wound_mask == 255)
+        for label, colour in (("red", _COLOUR_RED), ("yellow", _COLOUR_YELLOW), ("black", _COLOUR_BLACK)):
+            hit = ryb_pixel_labels == label
+            out[ys[hit], xs[hit]] = colour
     else:
         # Fallback: fill entire wound mask with a blended colour
         out[wound_mask == 255] = _COLOUR_RED
@@ -485,53 +509,16 @@ def analyze_image(
     img = cv2.imread(image_path)
     if img is None:
         raise FileNotFoundError(f"Could not read image: {image_path}")
+    return analyze_frame(img, coin_diam_cm)
 
-    # --- Calibration ---
-    coin, cm_per_px = calibrate(img, coin_diam_cm)
 
-    # --- Wound segmentation ---
-    mask = detect_wound_mask(img)
-
-    # --- Guard: reject bare skin and noise ---
-    if not is_wound_present(mask, img.shape):
-        return {
-            "area_cm2":        0.0,
-            "ryb_ratios":      {"red": 0.0, "yellow": 0.0, "black": 0.0},
-            "annotated_image": _make_no_wound_overlay(img),
-            "coin_found":      coin is not None,
-            "scale_cm_per_px": cm_per_px,
-            "wound_detected":  False,
-            "message":         "No wound detected",
-        }
-
-    area_cm2, contour = compute_wound_area(mask, cm_per_px)
-
-    # --- RYB tissue analysis ---
-    ryb = ryb_segment(img, mask)
-
-    # --- Per-pixel labels for overlay ---
-    pixel_labels = None
-    wound_coords = np.where(mask == 255)
-    if len(wound_coords[0]) > 0:
-        wound_pixels = img[wound_coords].reshape(-1, 1, 3).astype(np.uint8)
-        wound_hsv = cv2.cvtColor(wound_pixels, cv2.COLOR_BGR2HSV).reshape(-1, 3)
-        km = KMeans(n_clusters=3, n_init=10, random_state=42)
-        cluster_ids = km.fit_predict(wound_hsv.astype(np.float32))
-        cluster_tissue = [_classify_cluster_hsv(c) for c in km.cluster_centers_]
-        pixel_labels = np.array([cluster_tissue[cid] for cid in cluster_ids])
-
-    scan_result = {"area_cm2": area_cm2, "ryb_ratios": ryb}
-    annotated = draw_overlay(img, mask, pixel_labels, coin, scan_result)
-
-    return {
-        "area_cm2":        area_cm2,
-        "ryb_ratios":      ryb,
-        "annotated_image": annotated,
-        "coin_found":      coin is not None,
-        "scale_cm_per_px": cm_per_px,
-        "wound_detected":  True,
-        "message":         "Wound detected",
-    }
+def _limit_size(img: np.ndarray, max_side: int = MAX_ANALYSIS_SIDE) -> np.ndarray:
+    """Downscale so the long side is at most max_side px (area-preserving resample)."""
+    long_side = max(img.shape[:2])
+    if long_side <= max_side:
+        return img
+    scale = max_side / long_side
+    return cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
 
 
 def analyze_frame(
@@ -539,23 +526,21 @@ def analyze_frame(
     coin_diam_cm: float = COIN_REAL_DIAM_CM,
 ) -> dict:
     """
-    Real-time variant of analyze_image() that accepts a BGR numpy array directly.
+    Run the pipeline on a BGR numpy array (uploaded photo or video frame).
 
-    Designed for webcam / live-stream use — call with each decoded video frame.
+    Frames with a long side above MAX_ANALYSIS_SIDE are downscaled first;
+    the annotated image is returned at the analysed size.
     Returns the same dict as analyze_image() (including wound_detected).
-
-    Streamlit webcam example:
-        frame_bgr = cv2.cvtColor(webcam_frame_rgb, cv2.COLOR_RGB2BGR)
-        result = analyze_frame(frame_bgr)
-        st.image(cv2.cvtColor(result["annotated_image"], cv2.COLOR_BGR2RGB))
     """
     if frame is None or frame.size == 0:
         raise ValueError("analyze_frame: received empty frame")
 
+    frame = _limit_size(frame)
     coin, cm_per_px = calibrate(frame, coin_diam_cm)
 
     mask = detect_wound_mask(frame)
 
+    # --- Guard: reject bare skin and noise ---
     if not is_wound_present(mask, frame.shape):
         return {
             "area_cm2":        0.0,
@@ -568,17 +553,9 @@ def analyze_frame(
         }
 
     area_cm2, _ = compute_wound_area(mask, cm_per_px)
-    ryb = ryb_segment(frame, mask)
 
-    wound_coords = np.where(mask == 255)
-    pixel_labels = None
-    if len(wound_coords[0]) > 0:
-        wound_pixels = frame[wound_coords].reshape(-1, 1, 3).astype(np.uint8)
-        wound_hsv = cv2.cvtColor(wound_pixels, cv2.COLOR_BGR2HSV).reshape(-1, 3)
-        km = KMeans(n_clusters=3, n_init=10, random_state=42)
-        cluster_ids = km.fit_predict(wound_hsv.astype(np.float32))
-        cluster_tissue = [_classify_cluster_hsv(c) for c in km.cluster_centers_]
-        pixel_labels = np.array([cluster_tissue[cid] for cid in cluster_ids])
+    # --- RYB tissue analysis (one clustering pass feeds ratios and overlay) ---
+    ryb, pixel_labels = _ryb_cluster(frame, mask)
 
     scan_result = {"area_cm2": area_cm2, "ryb_ratios": ryb}
     annotated = draw_overlay(frame, mask, pixel_labels, coin, scan_result)

@@ -20,6 +20,7 @@ import base64
 import cv2
 import numpy as np
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+import anyio
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -369,20 +370,41 @@ def _safe_doctor(d: dict) -> dict:
 # Vision scan route
 # ---------------------------------------------------------------------------
 
+# Larger uploads are rejected before decoding (a 12 MP phone JPEG is ~3-5 MB)
+MAX_UPLOAD_BYTES = 15 * 1024 * 1024
+
+# At most one scan per CPU core runs at once; the rest wait their turn.
+# Each scan already uses several cores (OpenCV / K-Means), so more
+# concurrent scans only add thread contention.
+_SCAN_LIMITER = anyio.CapacityLimiter(os.cpu_count() or 1)
+
+
 @app.post("/api/scan/analyze")
 async def vision_analyze(
     patient_id: str = Form(...),
     file: UploadFile = File(None),
 ):
     """Accept an uploaded wound image (or use demo), run CV pipeline + KG."""
+    raw = None
+    if file and file.filename:
+        raw = await file.read(MAX_UPLOAD_BYTES + 1)
+        if len(raw) > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="Image too large (max 15 MB).")
+
+    # CV + knowledge graph are CPU-bound; running them on the event loop
+    # would block every other request until the scan finishes.
+    return await anyio.to_thread.run_sync(_analyze_scan, patient_id, raw, limiter=_SCAN_LIMITER)
+
+
+def _analyze_scan(patient_id: str, raw: bytes | None) -> dict:
     from vision import analyze_frame, analyze_patient
 
     patient = next((p for p in _load_patients() if p["patient_id"] == patient_id), None)
 
-    if file and file.filename:
-        raw = await file.read()
-        arr = np.frombuffer(raw, np.uint8)
-        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+    if raw is not None:
+        frame = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+        if frame is None:
+            raise HTTPException(status_code=400, detail="Could not read image file.")
         vision_result = analyze_frame(frame)
     else:
         # Demo mode: synthesize image from latest stored scan

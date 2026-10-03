@@ -1,0 +1,42 @@
+{
+  "machine": "arm64 arm, 14 cores",
+  "workers": 1,
+  "levels": [
+    {
+      "users": 1,
+      "requests": 4,
+      "errors": 0,
+      "error_types": {},
+      "p50_ms": 116,
+      "p95_ms": 131,
+      "throughput_rps": 8.56
+    },
+    {
+      "users": 10,
+      "requests": 40,
+      "errors": 0,
+      "error_types": {},
+      "p50_ms": 603,
+      "p95_ms": 987,
+      "throughput_rps": 14.68
+    },
+    {
+      "users": 25,
+      "requests": 100,
+      "errors": 0,
+      "error_types": {},
+      "p50_ms": 1639,
+      "p95_ms": 2449,
+      "throughput_rps": 13.75
+    },
+    {
+      "users": 50,
+      "requests": 200,
+      "errors": 0,
+      "error_types": {},
+      "p50_ms": 3468,
+      "p95_ms": 4180,
+      "throughput_rps": 13.86
+    }
+  ]
+}
