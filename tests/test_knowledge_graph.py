@@ -5,7 +5,9 @@ Test categories
 ---------------
 1. build_graph       — node taxonomy, edge weights, caching
 2. get_risk_factors  — comorbidity / biomarker activation and BFS reachability
-3. evaluate_healing  — one test per triage rule, severity resolution, output shape
+3. get_outcome_scores — wound-state nodes, compounding, no double counting
+4. evaluate_healing  — one test per triage rule, severity resolution, output shape
+5. graph escalation  — escalates on compounding risk, never de-escalates
 """
 
 from __future__ import annotations
@@ -17,7 +19,12 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from knowledge_graph import build_graph, evaluate_healing, get_risk_factors  # noqa: E402
-from knowledge_graph.graph import OUTCOME_NODES  # noqa: E402
+from knowledge_graph.reasoning import PRIORITY_ORDER  # noqa: E402
+from knowledge_graph.graph import (  # noqa: E402
+    OUTCOME_NODES,
+    compute_risk_score,
+    get_outcome_scores,
+)
 
 
 # ===========================================================================
@@ -105,7 +112,46 @@ class TestGetRiskFactors:
 
 
 # ===========================================================================
-# 3. evaluate_healing
+# 3. get_outcome_scores
+# ===========================================================================
+
+STALLED_NECROTIC = {"tissue_ratios": {"red": 70.0, "yellow": 20.0, "black": 10.0}, "area_delta": 0.3}
+
+
+class TestGetOutcomeScores:
+    def test_wound_state_activates_outcomes_for_healthy_patient(self):
+        scores = get_outcome_scores(_healthy_patient(), STALLED_NECROTIC)
+        assert {"Necrosis_Risk", "Infection_Risk", "Wound_Stagnation"} <= set(scores)
+
+    def test_without_wound_context_scores_only_patient_factors(self):
+        assert get_outcome_scores(_healthy_patient(), None) == {}
+
+    def test_independent_risk_factors_compound(self):
+        one = compute_risk_score(get_outcome_scores(_healthy_patient(blood_glucose=220.0)))
+        two = compute_risk_score(get_outcome_scores(_healthy_patient(blood_glucose=220.0, serum_albumin=2.5)))
+        assert two > one
+
+    def test_shared_mechanism_is_not_double_counted(self):
+        # Diabetes acts on Infection_Risk only through Hyperglycemia, so adding
+        # the diabetes label to an already-hyperglycemic patient must not
+        # raise Infection_Risk.
+        hyper = get_outcome_scores(_healthy_patient(blood_glucose=220.0))
+        both = get_outcome_scores(_healthy_patient(blood_glucose=220.0, comorbidities=["Type 2 Diabetes"]))
+        assert both["Infection_Risk"] == pytest.approx(hyper["Infection_Risk"])
+
+    def test_pad_amplifies_necrosis_risk(self):
+        base = get_outcome_scores(_healthy_patient(), STALLED_NECROTIC)
+        pad = get_outcome_scores(_healthy_patient(comorbidities=["Peripheral Artery Disease"]), STALLED_NECROTIC)
+        assert pad["Necrosis_Risk"] > base["Necrosis_Risk"]
+
+    def test_scores_are_independent_of_input_order(self):
+        a = _healthy_patient(comorbidities=["Obesity", "Malnutrition", "Type 2 Diabetes"])
+        b = _healthy_patient(comorbidities=["Type 2 Diabetes", "Malnutrition", "Obesity"])
+        assert get_outcome_scores(a, STALLED_NECROTIC) == get_outcome_scores(b, STALLED_NECROTIC)
+
+
+# ===========================================================================
+# 4. evaluate_healing
 # ===========================================================================
 
 class TestEvaluateHealing:
@@ -156,3 +202,41 @@ class TestEvaluateHealing:
     def test_reasoning_mentions_patient_name(self, delta):
         result = evaluate_healing(delta, HEALTHY_TISSUE, _healthy_patient())
         assert "Test Patient" in result["reasoning"]
+
+
+# ===========================================================================
+# 5. graph escalation
+# ===========================================================================
+
+HIGH_RISK_PATIENT = _healthy_patient(
+    comorbidities=["Type 2 Diabetes", "Obesity", "Peripheral Artery Disease"],
+    blood_glucose=250.0,
+    serum_albumin=2.4,
+    mobility_score=2,
+)
+
+
+class TestGraphEscalation:
+    def test_compounding_risk_escalates_above_rules(self):
+        # Necrosis 10% is below the 15% CRITICAL rule, but with ischemia,
+        # hyperglycemia and malnutrition on a stalled wound it is limb-threatening.
+        args = (0.3, STALLED_NECROTIC["tissue_ratios"], HIGH_RISK_PATIENT)
+        rules_only = evaluate_healing(*args, use_graph=False)
+        with_graph = evaluate_healing(*args)
+        assert PRIORITY_ORDER.index(with_graph["priority"]) < PRIORITY_ORDER.index(rules_only["priority"])
+        assert any("Compounding risk" in a for a in with_graph["alerts"])
+
+    def test_graph_never_lowers_rule_priority(self):
+        tissue = {"red": 60.0, "yellow": 20.0, "black": 20.0}
+        result = evaluate_healing(HEALING_DELTA, tissue, _healthy_patient())
+        assert result["priority"] == "CRITICAL"
+
+    def test_healthy_healing_patient_stays_ok(self):
+        result = evaluate_healing(HEALING_DELTA, HEALTHY_TISSUE, _healthy_patient())
+        assert result["priority"] == "OK"
+        assert not any("Compounding risk" in a for a in result["alerts"])
+
+    def test_risk_score_is_returned_and_ranks_patients(self):
+        low = evaluate_healing(HEALING_DELTA, HEALTHY_TISSUE, _healthy_patient())
+        high = evaluate_healing(0.3, STALLED_NECROTIC["tissue_ratios"], HIGH_RISK_PATIENT)
+        assert high["risk_score"] > low["risk_score"] >= 0.0

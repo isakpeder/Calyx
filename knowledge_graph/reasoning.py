@@ -12,13 +12,22 @@ All triggered alerts are collected (no short-circuit) so clinicians
 see the full picture even for CRITICAL wounds.
 """
 
-from .graph import get_risk_factors
+from .graph import compute_risk_score, get_outcome_scores
 
 # ---------------------------------------------------------------------------
 # Priority ordering (index = severity rank, 0 = highest)
 # ---------------------------------------------------------------------------
 
 PRIORITY_ORDER = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "OK"]
+
+# Minimum knowledge-graph risk score for each priority, highest first.
+# Tuned on the dev split of evals/triage (see evals/triage/tune.py).
+GRAPH_PRIORITY_THRESHOLDS: list[tuple[str, float]] = [
+    ("CRITICAL", 7.00),
+    ("HIGH",     4.50),
+    ("MEDIUM",   4.25),
+    ("LOW",      3.50),
+]
 
 
 def _priority_rank(p: str) -> int:
@@ -49,6 +58,14 @@ def _format_area_trend(area_delta: float) -> str:
         return f"stalled/growing by +{area_delta:.2f} cm²"
     else:
         return "essentially unchanged (±0.1 cm²)"
+
+
+def _graph_priority(risk_score: float) -> str:
+    """Map a knowledge-graph risk score to a priority level."""
+    for priority, threshold in GRAPH_PRIORITY_THRESHOLDS:
+        if risk_score >= threshold:
+            return priority
+    return "OK"
 
 
 def _build_reasoning(
@@ -100,10 +117,15 @@ def evaluate_healing(
     area_delta: float,
     tissue_ratios: dict,
     health_data: dict,
+    use_graph: bool = True,
 ) -> dict:
     """
     Evaluate wound healing status using rule-based clinical logic
-    combined with knowledge graph risk factor traversal.
+    combined with knowledge graph risk scoring.
+
+    The rules catch single-signal emergencies (e.g. necrosis > 15%). The
+    knowledge graph scores how the patient's comorbidities, biomarkers and
+    wound state compound, and can escalate — never lower — the rule priority.
 
     Parameters
     ----------
@@ -116,6 +138,8 @@ def evaluate_healing(
         Values are percentages.
     health_data : dict
         Full patient profile dict from mock_patients.py.
+    use_graph : bool
+        False disables graph escalation (rules-only baseline for evals).
 
     Returns
     -------
@@ -125,6 +149,7 @@ def evaluate_healing(
         "reasoning"           : str
         "active_risk_factors" : list[str]
         "recommended_action"  : str
+        "risk_score"          : float  (0–1, dashboard tie-breaker)
     """
     # Extract values with safe defaults
     black          = tissue_ratios.get("black", 0.0)
@@ -197,6 +222,27 @@ def evaluate_healing(
         ))
 
     # -----------------------------------------------------------------------
+    # Knowledge graph risk scoring
+    # -----------------------------------------------------------------------
+    wound = {"tissue_ratios": tissue_ratios, "area_delta": area_delta}
+    outcome_scores = get_outcome_scores(health_data, wound)
+    risk_score = compute_risk_score(outcome_scores)
+    active_risk_factors = sorted(outcome_scores, key=outcome_scores.get, reverse=True)
+
+    if use_graph:
+        graph_priority = _graph_priority(risk_score)
+        rule_rank = min(rank for rank, _, _ in triggered)
+        if _priority_rank(graph_priority) < rule_rank:
+            drivers = ", ".join(n.replace("_", " ") for n in active_risk_factors[:3])
+            triggered.append((
+                _priority_rank(graph_priority),
+                f"{graph_priority.title()}: Compounding risk factors ({drivers})",
+                "Escalate for clinical review — multiple risk factors are compounding",
+            ))
+            # A graph escalation supersedes the "On Track" fallthrough
+            triggered = [t for t in triggered if t[0] != _priority_rank("OK")]
+
+    # -----------------------------------------------------------------------
     # Resolve priority and assemble output
     # -----------------------------------------------------------------------
     # Sort so highest severity (lowest rank index) is first
@@ -205,9 +251,6 @@ def evaluate_healing(
     highest_rank, _, highest_action = triggered[0]
     priority = PRIORITY_ORDER[highest_rank]
     alerts   = [alert for _, alert, _ in triggered]
-
-    # Knowledge graph risk factor traversal
-    active_risk_factors = get_risk_factors(health_data)
 
     reasoning = _build_reasoning(
         priority=priority,
@@ -224,4 +267,5 @@ def evaluate_healing(
         "reasoning":           reasoning,
         "active_risk_factors": active_risk_factors,
         "recommended_action":  highest_action,
+        "risk_score":          risk_score,
     }

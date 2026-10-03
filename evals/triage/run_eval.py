@@ -10,7 +10,7 @@ ranking_accuracy   over every pair of cases with different expected severity,
                    share the dashboard sort orders correctly (ties count 0.5)
 
 Usage:
-    python -m evals.triage.run_eval [--split test|dev|all]
+    python -m evals.triage.run_eval [--split test|dev|all] [--rules-only]
 """
 
 from __future__ import annotations
@@ -32,12 +32,16 @@ def _rank(priority: str) -> int:
     return PRIORITIES.index(priority)
 
 
-def _run_system(cases: list[dict]) -> list[dict]:
+def _run_system(cases: list[dict], use_graph: bool) -> list[dict]:
     """Run the engine on every case; return (priority, risk_score) per case."""
     outputs = []
     for case in cases:
-        result = evaluate_healing(case["area_delta"], case["tissue_ratios"], case["patient"])
-        outputs.append({"priority": result["priority"], "risk_score": result.get("risk_score", 0.0)})
+        result = evaluate_healing(
+            case["area_delta"], case["tissue_ratios"], case["patient"], use_graph=use_graph
+        )
+        # Rules-only reproduces the original engine, which had no risk score
+        risk_score = result["risk_score"] if use_graph else 0.0
+        outputs.append({"priority": result["priority"], "risk_score": risk_score})
     return outputs
 
 
@@ -93,21 +97,23 @@ def score(cases: list[dict], outputs: list[dict]) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--split", choices=["dev", "test", "all"], default="test")
-    parser.add_argument("--label", default="current", help="name for the results file")
+    parser.add_argument("--rules-only", action="store_true", help="disable knowledge-graph escalation")
+    parser.add_argument("--label", default=None, help="name for the results file")
     args = parser.parse_args()
 
     cases = json.loads(CASES_PATH.read_text())
     if args.split != "all":
         cases = [c for c in cases if c["split"] == args.split]
 
-    metrics = score(cases, _run_system(cases))
+    label = args.label or ("rules_only" if args.rules_only else "rules_plus_graph")
+    metrics = score(cases, _run_system(cases, use_graph=not args.rules_only))
     metrics["split"] = args.split
 
     RESULTS_DIR.mkdir(exist_ok=True)
-    out = RESULTS_DIR / f"triage_{args.label}_{args.split}.json"
+    out = RESULTS_DIR / f"triage_{label}_{args.split}.json"
     out.write_text(json.dumps(metrics, indent=2) + "\n")
 
-    print(f"[{args.label} / {args.split}] n={metrics['n_cases']}")
+    print(f"[{label} / {args.split}] n={metrics['n_cases']}")
     for key in ("accuracy", "critical_recall", "macro_f1", "ranking_accuracy"):
         print(f"  {key:<17} {metrics[key]:.3f}")
     print(f"  top errors        {metrics['top_errors']}")
